@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 function BrandMark() {
   return (
@@ -109,6 +109,14 @@ function NavIcon({ name }) {
       </>
     ),
     chevron: <path d="m9 18 6-6-6-6" />,
+    chevronDown: <path d="m6 9 6 6 6-6" />,
+    check: <path d="m5 12.5 4.3 4.2L19 7" />,
+    user: (
+      <>
+        <circle cx="12" cy="8" r="3.4" />
+        <path d="M5 20c.7-3.7 3.4-5.6 7-5.6s6.3 1.9 7 5.6" />
+      </>
+    ),
   };
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" aria-hidden="true">
@@ -137,21 +145,176 @@ const NAV_GROUPS = [
   {
     label: "Tahlil va rejalash",
     items: [
-      { href: "/raqamli-rivojlanish", icon: "dri", label: "Raqamli rivojlanish" },
-      { href: "/kpi", icon: "kpi", label: "KPI" },
-      { href: "/analitika", icon: "analytics", label: "Analitika" },
-      { href: "/prognoz", icon: "forecast", label: "Prognoz" },
-      { href: "/reyting", icon: "rating", label: "Reyting" },
+      { href: "/raqamli-rivojlanish", icon: "dri", label: "Raqamli rivojlanish", ready: true },
+      { href: "/kpi", icon: "kpi", label: "KPI", ready: true },
+      { href: "/analitika", icon: "analytics", label: "Analitika", ready: true },
+      { href: "/prognoz", icon: "forecast", label: "Prognoz", ready: true },
+      { href: "/reyting", icon: "rating", label: "Reyting", ready: true },
     ],
   },
   {
     label: "Tizim",
     items: [
-      { href: "/hisobotlar", icon: "reports", label: "Hisobotlar" },
-      { href: "/sozlamalar", icon: "settings", label: "Sozlamalar" },
+      { href: "/hisobotlar", icon: "reports", label: "Hisobotlar", ready: true },
+      { href: "/sozlamalar", icon: "settings", label: "Sozlamalar", ready: true },
     ],
   },
 ];
+
+const WORKSPACES = [
+  {
+    id: "olimp",
+    name: "Olimp sport klubi",
+    meta: "Toshkent · Professional klub",
+    initials: "OS",
+  },
+  {
+    id: "humo",
+    name: "Humo Arena",
+    meta: "Toshkent · Sport majmuasi",
+    initials: "HA",
+  },
+  {
+    id: "befit",
+    name: "BeFit Eco",
+    meta: "Toshkent · Fitness markazi",
+    initials: "BE",
+  },
+];
+
+function useDismissableMenu(open, setOpen) {
+  const rootRef = useRef(null);
+
+  useEffect(() => {
+    if (!open) return undefined;
+
+    const closeOnOutsidePress = (event) => {
+      if (!rootRef.current?.contains(event.target)) setOpen(false);
+    };
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+
+    document.addEventListener("pointerdown", closeOnOutsidePress);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", closeOnOutsidePress);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [open, setOpen]);
+
+  return rootRef;
+}
+
+function WorkspaceSwitcher({ workspaceId, onChange }) {
+  const [open, setOpen] = useState(false);
+  const rootRef = useDismissableMenu(open, setOpen);
+  const workspace = WORKSPACES.find((item) => item.id === workspaceId) ?? WORKSPACES[0];
+
+  return (
+    <div className={`app-workspace-switcher${open ? " is-open" : ""}`} ref={rootRef}>
+      {open ? (
+        <div className="app-workspace-menu" role="menu" aria-label="Tashkilotni tanlang">
+          <header>
+            <span>Tashkilotni tanlang</span>
+            <small>{WORKSPACES.length} ta workspace</small>
+          </header>
+          <div>
+            {WORKSPACES.map((item) => (
+              <button
+                type="button"
+                role="menuitemradio"
+                aria-checked={workspace.id === item.id}
+                key={item.id}
+                className={workspace.id === item.id ? "is-selected" : ""}
+                onClick={() => {
+                  onChange(item.id);
+                  setOpen(false);
+                }}
+              >
+                <span className="app-workspace-option-avatar mono">{item.initials}</span>
+                <span>
+                  <strong>{item.name}</strong>
+                  <small>{item.meta}</small>
+                </span>
+                {workspace.id === item.id ? <NavIcon name="check" /> : null}
+              </button>
+            ))}
+          </div>
+          <Link href="/sozlamalar" onClick={() => setOpen(false)}>
+            <NavIcon name="settings" />
+            Tashkilot sozlamalari
+          </Link>
+        </div>
+      ) : null}
+
+      <button
+        type="button"
+        className="app-sidebar-context"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => setOpen((current) => !current)}
+      >
+        <span className="app-workspace-avatar mono" aria-hidden="true">{workspace.initials}</span>
+        <span>
+          <strong>{workspace.name}</strong>
+          <small>Joriy tashkilot</small>
+        </span>
+        <NavIcon name="chevronDown" />
+      </button>
+    </div>
+  );
+}
+
+function AccountMenu() {
+  const [open, setOpen] = useState(false);
+  const rootRef = useDismissableMenu(open, setOpen);
+
+  return (
+    <div className={`app-account-menu${open ? " is-open" : ""}`} ref={rootRef}>
+      <button
+        type="button"
+        className="app-user-summary"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => setOpen((current) => !current)}
+      >
+        <span className="app-user-avatar" aria-hidden="true">AK</span>
+        <span className="app-user-copy">
+          <strong>Aziz Karimov</strong>
+          <small>Rahbar</small>
+        </span>
+        <NavIcon name="chevronDown" />
+      </button>
+
+      {open ? (
+        <div className="app-account-dropdown" role="menu" aria-label="Foydalanuvchi menyusi">
+          <div className="app-account-card">
+            <span className="app-user-avatar" aria-hidden="true">AK</span>
+            <span>
+              <strong>Aziz Karimov</strong>
+              <small>aziz.karimov@olimpsk.uz</small>
+            </span>
+          </div>
+          <span className="app-account-role">Rahbar kabineti</span>
+          <Link href="/sozlamalar" role="menuitem" onClick={() => setOpen(false)}>
+            <NavIcon name="user" />
+            Hisob va profil
+          </Link>
+          <Link href="/sozlamalar" role="menuitem" onClick={() => setOpen(false)}>
+            <NavIcon name="settings" />
+            Sozlamalar
+          </Link>
+          <div className="app-account-divider"></div>
+          <Link className="is-danger" href="/login" role="menuitem" onClick={() => setOpen(false)}>
+            <NavIcon name="logout" />
+            Tizimdan chiqish
+          </Link>
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 function SidebarNav({ pathname, onNavigate }) {
   return (
@@ -193,6 +356,7 @@ function SidebarNav({ pathname, onNavigate }) {
 export default function AppShell({ children }) {
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [workspaceId, setWorkspaceId] = useState("olimp");
   const currentPage =
     NAV_GROUPS.flatMap((group) => group.items).find((item) => pathname === item.href)?.label ??
     "Rahbar paneli";
@@ -219,13 +383,7 @@ export default function AppShell({ children }) {
 
       <SidebarNav pathname={pathname} onNavigate={() => setDrawerOpen(false)} />
 
-      <div className="app-sidebar-context">
-        <span className="app-context-dot" aria-hidden="true"></span>
-        <span>
-          <strong>Rahbar kabineti</strong>
-          <small>Olimp sport klubi</small>
-        </span>
-      </div>
+      <WorkspaceSwitcher workspaceId={workspaceId} onChange={setWorkspaceId} />
     </>
   );
 
@@ -292,18 +450,7 @@ export default function AppShell({ children }) {
               <NavIcon name="bell" />
               <span aria-hidden="true"></span>
             </button>
-            <div className="app-user-summary">
-              <span className="app-user-avatar" aria-hidden="true">
-                AK
-              </span>
-              <span className="app-user-copy">
-                <strong>Aziz Karimov</strong>
-                <small>Rahbar · Olimp SK</small>
-              </span>
-            </div>
-            <Link className="app-user-logout" href="/login" aria-label="Tizimdan chiqish">
-              <NavIcon name="logout" />
-            </Link>
+            <AccountMenu />
           </div>
         </header>
 

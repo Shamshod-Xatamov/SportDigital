@@ -50,7 +50,7 @@ Asosiy qiymat zanjiri (TZ 20-bo'lim):
 - **Byudjet:** $200 — barcha ma'lumotlar **mock/simulyatsiya**, real backend hisob-kitob keyingi bosqichga (AI-BPM Monitor loyihasidagi kabi frontend data layer).
 - **Tillar:** UZ (asosiy), RU keyin; struktura i18n-ga tayyor bo'lsin.
 - **Menyu (TZ 23):** Bosh sahifa, Dashboard, Tashkilotlar, Xizmatlar, Muxlislar/CRM, Marketing, Moliya, Raqamli rivojlanish, KPI, Analitika, Prognoz, Reyting, Hisobotlar, Sozlamalar.
-- **Grafiklar (TZ 18):** Line, Bar, Pie, Area, Radar, Gauge, Heatmap, KPI Cards — avvalgi loyihadagidek qo'lda SVG chartlar (yengil, brendga mos).
+- **Grafiklar (TZ 18):** Line, Bar, Pie, Area, Radar, Gauge, Heatmap, KPI Cards — barchasi qo'lda SVG bilan yozilgan (kutubxonasiz). Holat: Line/Area (Dashboard, Moliya, KPI), Bar (Marketing), Gauge (KPI, DRI), Heatmap + Scatter + Radar + Pie (Analitika).
 
 ## 2. Texnik stack (Business_Process bilan bir xil tashkilot, boshqa dizayn)
 
@@ -109,9 +109,13 @@ AI-BPM Monitor (iliq ivory + ember) va standart AI-ko'k/binafsha gradientlardan 
 - [x] Muxlislar / CRM (segmentlar + reyestr + profil).
 - [x] Marketing: 8 kanal samaradorligi, ROI formulasi (avtomatik), oylik xarajat/daromad grafigi, kampaniyalar reyestri, konversiya voronkasi.
 - [x] Moliya: 11 daromad manbasi, xarajat tarkibi, sof foyda grafigi, rentabellik, ARPU, o'rtacha tranzaksiya, raqamli ulush, operatsiyalar reyestri.
-- [ ] DRI hisoblagich sahifasi (indikator ballari → indeks).
-- [ ] KPI monitoring, Analitika, Prognoz (2026–2030), Reyting TOP-10.
-- [ ] Decision Support tavsiyalar, Hisobotlar (PDF/Excel/CSV eksport UI).
+- [x] DRI hisoblagich sahifasi: 12 indikator, vaznli indeks, yo'nalishlar kesimi, interaktiv baholash va avtomatik tavsiyalar.
+- [x] KPI monitoring: 8 KPI (joriy/oldingi/o'zgarish/maqsad/bajarilish), gauge kartalar, kategoriya filtri, oy/chorak/yil kesimi, reyting paneli, 12 oylik trend + formula oynasi.
+- [x] Analitika: korrelyatsiya matritsasi (heatmap), regressiya tahlili (scatter + R² donut), tashkilotlarni ko'p o'lchovli taqqoslash (radar), anomaliyalarni aniqlash (trenddan chetlanish, ±2σ). Barcha statistika real formulalar bilan hisoblanadi.
+- [x] Prognoz: 8 ko'rsatkich, fan chart (bashorat oralig'i 80%/95%), 3 stsenariy, 3 model, gorizont tanlash (2028/2029/2030), yillik qiymatlar va dumbbell taqqoslash. Trend, R², MAPE va oraliqlar real formulalar bilan hisoblanadi.
+- [x] Reyting: 6 mezon vaznli baholash (Σ Wi × Xi), TOP-10, podium, ball taqsimoti (darajalar bo'yicha nuqtali diagramma), o'zgarishlar ro'yxati, mezonlar bo'yicha stacked bar va tashkilot profili.
+- [ ] Decision Support tavsiyalar.
+- [x] Hisobotlar: 10 turdagi shablon, PDF/Excel/CSV formatlari, tarix reyestri va rejalashtirilgan jo'natmalar UI.
 - [ ] "Platforma samaradorligi" before/after oynasi (TZ 26).
 
 ### Phase 4 — Sayqallash va topshirish
