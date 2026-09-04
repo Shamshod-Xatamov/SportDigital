@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 function BrandMark() {
@@ -33,6 +34,7 @@ function LockIcon() {
 const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
 
 export default function LoginPage() {
+  const router = useRouter();
   const [mode, setMode] = useState("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -64,7 +66,13 @@ export default function LoginPage() {
     if (Object.keys(nextErrors).length > 0) return;
 
     setStatus("loading");
-    window.setTimeout(() => setStatus("done"), 700);
+    window.setTimeout(() => {
+      if (mode === "login") {
+        router.push("/dashboard");
+      } else {
+        setStatus("done");
+      }
+    }, 700);
   };
 
   return (

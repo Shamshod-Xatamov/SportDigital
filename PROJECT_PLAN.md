@@ -96,14 +96,14 @@ AI-BPM Monitor (iliq ivory + ember) va standart AI-ko'k/binafsha gradientlardan 
 
 ### Phase 2 — App foundation
 
-- [x] Login ekrani (mock auth): split layout, validatsiya, parolni tiklash rejimi, demo rollar.
-- [ ] App shell: sidebar (TZ 23 menyu), topbar, role switch (mock).
-- [ ] Mock data layer: tashkilotlar, xizmatlar, muxlislar, moliya, marketing, DRI, KPI.
-- [ ] Login submit → dashboardga redirect (hozircha inline success holati).
+- [x] Login ekrani (mock auth): markazlashgan karta, validatsiya, parolni tiklash rejimi.
+- [x] App shell: night sidebar (TZ 23 menyu, 4 guruh), mobil drawer, user karta.
+- [x] Mock data layer boshlanishi: `lib/mock/dashboard.js` (5 davr kesimi, KPI, tavsiyalar, segmentlar).
+- [x] Login submit → /dashboard redirect.
 
 ### Phase 3 — Asosiy ekranlar (mock data bilan)
 
-- [ ] Rahbar Dashboard (davr filtrlari bilan).
+- [x] Rahbar Dashboard: 4 stat karta (sparkline), interaktiv daromad grafigi (hover tooltip), DRI gauge, daromad manbalari, KPI jadvali, Decision Support tavsiyalari, muxlislar segmentlari — kun/hafta/oy/chorak/yil filtrlari bilan.
 - [ ] Tashkilotlar reyestri (jadval + detail).
 - [ ] Xizmatlar, CRM/segmentlar, Marketing (ROI), Moliya.
 - [ ] DRI hisoblagich sahifasi (indikator ballari → indeks).
