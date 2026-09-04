@@ -1,4 +1,4 @@
-import { Barlow_Condensed, Chivo_Mono, Instrument_Sans } from "next/font/google";
+import { Barlow_Condensed, JetBrains_Mono, Manrope } from "next/font/google";
 import "./globals.css";
 
 const barlow = Barlow_Condensed({
@@ -8,14 +8,14 @@ const barlow = Barlow_Condensed({
   display: "swap",
 });
 
-const instrument = Instrument_Sans({
-  subsets: ["latin", "latin-ext"],
+const instrument = Manrope({
+  subsets: ["latin", "cyrillic"],
   variable: "--font-instrument",
   display: "swap",
 });
 
-const chivoMono = Chivo_Mono({
-  subsets: ["latin", "latin-ext"],
+const chivoMono = JetBrains_Mono({
+  subsets: ["latin", "cyrillic"],
   weight: ["400", "500", "600"],
   variable: "--font-chivo",
   display: "swap",

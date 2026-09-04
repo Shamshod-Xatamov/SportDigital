@@ -102,6 +102,13 @@ function NavIcon({ name }) {
         <path d="M10 12h10M16.5 8.5 20 12l-3.5 3.5" />
       </>
     ),
+    bell: (
+      <>
+        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
+        <path d="M10 21h4" />
+      </>
+    ),
+    chevron: <path d="m9 18 6-6-6-6" />,
   };
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" aria-hidden="true">
@@ -112,15 +119,15 @@ function NavIcon({ name }) {
 
 const NAV_GROUPS = [
   {
-    label: "Boshqaruv",
+    label: "Asosiy",
     items: [
       { href: "/dashboard", icon: "dashboard", label: "Dashboard", ready: true },
-      { href: "/tashkilotlar", icon: "orgs", label: "Tashkilotlar" },
+      { href: "/tashkilotlar", icon: "orgs", label: "Tashkilotlar", ready: true },
       { href: "/xizmatlar", icon: "services", label: "Sport xizmatlari" },
     ],
   },
   {
-    label: "Muxlislar va bozor",
+    label: "Auditoriya va daromad",
     items: [
       { href: "/muxlislar", icon: "fans", label: "Muxlislar / CRM" },
       { href: "/marketing", icon: "marketing", label: "Marketing" },
@@ -128,7 +135,7 @@ const NAV_GROUPS = [
     ],
   },
   {
-    label: "Tahlil",
+    label: "Tahlil va rejalash",
     items: [
       { href: "/raqamli-rivojlanish", icon: "dri", label: "Raqamli rivojlanish" },
       { href: "/kpi", icon: "kpi", label: "KPI" },
@@ -138,7 +145,7 @@ const NAV_GROUPS = [
     ],
   },
   {
-    label: "Boshqa",
+    label: "Tizim",
     items: [
       { href: "/hisobotlar", icon: "reports", label: "Hisobotlar" },
       { href: "/sozlamalar", icon: "settings", label: "Sozlamalar" },
@@ -162,7 +169,7 @@ function SidebarNav({ pathname, onNavigate }) {
                 onClick={onNavigate}
               >
                 <NavIcon name={item.icon} />
-                {item.label}
+                <span>{item.label}</span>
               </Link>
             ) : (
               <span
@@ -172,7 +179,8 @@ function SidebarNav({ pathname, onNavigate }) {
                 aria-disabled="true"
               >
                 <NavIcon name={item.icon} />
-                {item.label}
+                <span>{item.label}</span>
+                <i className="app-nav-soon-dot" aria-hidden="true"></i>
               </span>
             ),
           )}
@@ -185,6 +193,9 @@ function SidebarNav({ pathname, onNavigate }) {
 export default function AppShell({ children }) {
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const currentPage =
+    NAV_GROUPS.flatMap((group) => group.items).find((item) => pathname === item.href)?.label ??
+    "Rahbar paneli";
 
   useEffect(() => {
     document.body.classList.toggle("app-drawer-open", drawerOpen);
@@ -197,26 +208,23 @@ export default function AppShell({ children }) {
 
   const sidebarInner = (
     <>
-      <Link className="brand app-brand" href="/" aria-label="SportDigital bosh sahifa">
-        <BrandMark />
-        <span className="brand-copy">
-          Sport<em>Digital</em>
-        </span>
-      </Link>
+      <div className="app-sidebar-head">
+        <Link className="brand app-brand" href="/" aria-label="SportDigital bosh sahifa">
+          <BrandMark />
+          <span className="brand-copy">
+            Sport<em>Digital</em>
+          </span>
+        </Link>
+      </div>
 
       <SidebarNav pathname={pathname} onNavigate={() => setDrawerOpen(false)} />
 
-      <div className="app-user">
-        <span className="app-user-avatar" aria-hidden="true">
-          AK
+      <div className="app-sidebar-context">
+        <span className="app-context-dot" aria-hidden="true"></span>
+        <span>
+          <strong>Rahbar kabineti</strong>
+          <small>Olimp sport klubi</small>
         </span>
-        <span className="app-user-copy">
-          <strong>Aziz Karimov</strong>
-          <small>Rahbar · Olimp SK</small>
-        </span>
-        <Link className="app-user-logout" href="/login" aria-label="Tizimdan chiqish">
-          <NavIcon name="logout" />
-        </Link>
       </div>
     </>
   );
@@ -243,11 +251,25 @@ export default function AppShell({ children }) {
             Sport<em>Digital</em>
           </span>
         </Link>
+        <span className="app-user-avatar" aria-hidden="true">
+          AK
+        </span>
       </header>
 
       {drawerOpen ? (
         <div className="app-drawer" id="app-drawer">
-          <div className="app-drawer-panel">{sidebarInner}</div>
+          <div className="app-drawer-panel">
+            <button
+              type="button"
+              className="app-drawer-close"
+              aria-label="Menyuni yopish"
+              onClick={() => setDrawerOpen(false)}
+            >
+              <span></span>
+              <span></span>
+            </button>
+            {sidebarInner}
+          </div>
           <button
             type="button"
             className="app-drawer-backdrop"
@@ -257,7 +279,36 @@ export default function AppShell({ children }) {
         </div>
       ) : null}
 
-      <div className="app-content">{children}</div>
+      <section className="app-workspace">
+        <header className="app-topbar">
+          <nav className="app-breadcrumb" aria-label="Navigatsiya yo'li">
+            <span>SportDigital</span>
+            <NavIcon name="chevron" />
+            <strong>{pathname === "/dashboard" ? "Rahbar paneli" : currentPage}</strong>
+          </nav>
+
+          <div className="app-topbar-actions">
+            <button type="button" className="app-icon-button" aria-label="Bildirishnomalar">
+              <NavIcon name="bell" />
+              <span aria-hidden="true"></span>
+            </button>
+            <div className="app-user-summary">
+              <span className="app-user-avatar" aria-hidden="true">
+                AK
+              </span>
+              <span className="app-user-copy">
+                <strong>Aziz Karimov</strong>
+                <small>Rahbar · Olimp SK</small>
+              </span>
+            </div>
+            <Link className="app-user-logout" href="/login" aria-label="Tizimdan chiqish">
+              <NavIcon name="logout" />
+            </Link>
+          </div>
+        </header>
+
+        <main className="app-content">{children}</main>
+      </section>
     </div>
   );
 }

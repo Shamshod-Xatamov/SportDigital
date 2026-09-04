@@ -41,6 +41,42 @@ function DeltaChip({ value, suffix = "%" }) {
   );
 }
 
+function MetricIcon({ name }) {
+  const paths = {
+    revenue: (
+      <>
+        <path d="M4 18.5h16M6.5 15V9.5M11 15V5.5M15.5 15v-3M20 15V7.5" />
+      </>
+    ),
+    users: (
+      <>
+        <circle cx="9" cy="8" r="3.25" />
+        <path d="M3.5 19c.6-3.4 2.8-5.2 5.5-5.2s4.9 1.8 5.5 5.2" />
+        <path d="M15.5 6.3a3 3 0 0 1 0 5.4M16.5 14c2.2.5 3.6 2.1 4 4.5" />
+      </>
+    ),
+    fanActivity: (
+      <>
+        <path d="M4 12h3l2-5 4 10 2-5h5" />
+        <path d="M3.5 5.5A9 9 0 0 1 20 7M20.5 18.5A9 9 0 0 1 4 17" />
+      </>
+    ),
+    dri: (
+      <>
+        <path d="M4 17a8 8 0 0 1 16 0" />
+        <path d="M12 17 16 9" />
+        <path d="M3 21h18" />
+      </>
+    ),
+  };
+
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" aria-hidden="true">
+      {paths[name]}
+    </svg>
+  );
+}
+
 /* ---------- Mini sparkline (stat kartalar uchun) ---------- */
 
 function Sparkline({ points, id }) {
@@ -70,7 +106,7 @@ function Sparkline({ points, id }) {
 
 /* ---------- Asosiy daromad grafigi (hover bilan) ---------- */
 
-const CHART = { W: 660, H: 250, padL: 48, padR: 34, padT: 14, padB: 30 };
+const CHART = { W: 660, H: 320, padL: 48, padR: 34, padT: 16, padB: 34 };
 
 function RevenueChart({ data }) {
   const [hover, setHover] = useState(null);
@@ -107,7 +143,7 @@ function RevenueChart({ data }) {
       <svg
         className="revenue-chart"
         viewBox={`0 0 ${W} ${H}`}
-        preserveAspectRatio="none"
+        preserveAspectRatio="xMidYMid meet"
         onMouseMove={handleMove}
         aria-label="Davr bo'yicha jami va raqamli daromad grafigi"
         role="img"
@@ -213,7 +249,7 @@ function DriGauge({ value }) {
 /* ---------- Sahifa ---------- */
 
 const STAT_DEFS = [
-  { key: "revenue", label: "Jami daromad", format: (s) => formatMln(s.value), sub: (s) => "so'm" },
+  { key: "revenue", label: "Jami daromad", format: (s) => formatMln(s.value), sub: () => "so'm" },
   { key: "users", label: "Faol foydalanuvchilar", format: (s) => formatNumber(s.value), sub: () => "foydalanuvchi" },
   { key: "fanActivity", label: "Muxlislar faolligi", format: (s) => `${s.value}%`, sub: () => "MF indeksi" },
   { key: "dri", label: "Raqamli rivojlanish", format: (s) => s.value, sub: () => "DRI · 100 dan" },
@@ -231,6 +267,7 @@ export default function DashboardPage() {
     <div className="dash">
       <header className="dash-head">
         <div className="dash-title">
+          <span className="dash-eyebrow">Rahbar kabineti</span>
           <h1>Boshqaruv paneli</h1>
           <p>
             <span className="live-dot" aria-hidden="true"></span>
@@ -238,19 +275,22 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        <div className="period-switch" role="tablist" aria-label="Davr bo'yicha filtr">
-          {PERIODS.map((p) => (
-            <button
-              key={p.id}
-              type="button"
-              role="tab"
-              aria-selected={period === p.id}
-              className={`period-btn${period === p.id ? " is-active" : ""}`}
-              onClick={() => setPeriod(p.id)}
-            >
-              {p.label}
-            </button>
-          ))}
+        <div className="dash-filter">
+          <span>Ko'rsatish davri</span>
+          <div className="period-switch" role="tablist" aria-label="Davr bo'yicha filtr">
+            {PERIODS.map((p) => (
+              <button
+                key={p.id}
+                type="button"
+                role="tab"
+                aria-selected={period === p.id}
+                className={`period-btn${period === p.id ? " is-active" : ""}`}
+                onClick={() => setPeriod(p.id)}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
         </div>
       </header>
 
@@ -261,7 +301,12 @@ export default function DashboardPage() {
           return (
             <article className="stat-card" key={def.key}>
               <div className="stat-top">
-                <span className="stat-label">{def.label}</span>
+                <span className="stat-label">
+                  <i className="stat-icon">
+                    <MetricIcon name={def.key} />
+                  </i>
+                  {def.label}
+                </span>
                 <DeltaChip value={stat.delta} />
               </div>
               <p className="stat-value mono">{def.format(stat)}</p>
