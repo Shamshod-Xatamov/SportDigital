@@ -123,15 +123,15 @@ const NAV_GROUPS = [
     items: [
       { href: "/dashboard", icon: "dashboard", label: "Dashboard", ready: true },
       { href: "/tashkilotlar", icon: "orgs", label: "Tashkilotlar", ready: true },
-      { href: "/xizmatlar", icon: "services", label: "Sport xizmatlari" },
+      { href: "/xizmatlar", icon: "services", label: "Sport xizmatlari", ready: true },
     ],
   },
   {
     label: "Auditoriya va daromad",
     items: [
-      { href: "/muxlislar", icon: "fans", label: "Muxlislar / CRM" },
-      { href: "/marketing", icon: "marketing", label: "Marketing" },
-      { href: "/moliya", icon: "finance", label: "Moliya" },
+      { href: "/muxlislar", icon: "fans", label: "Muxlislar / CRM", ready: true },
+      { href: "/marketing", icon: "marketing", label: "Marketing", ready: true },
+      { href: "/moliya", icon: "finance", label: "Moliya", ready: true },
     ],
   },
   {

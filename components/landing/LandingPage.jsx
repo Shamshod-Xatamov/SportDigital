@@ -183,10 +183,38 @@ const DRI_INDICATORS = [
 ];
 
 const KPI_CARDS = [
-  { code: "MF", name: "Muxlislar faolligi", value: "74%", delta: "+12.4%", target: "80%", progress: 92 },
-  { code: "ARPU", name: "Foydalanuvchi daromadi", value: "128K", delta: "+8.1%", target: "150K", progress: 85 },
-  { code: "ROI", name: "Marketing ROI", value: "142%", delta: "+21%", target: "120%", progress: 100 },
-  { code: "RR", name: "Retention Rate", value: "81%", delta: "+3.2%", target: "85%", progress: 95 },
+  {
+    code: "MF",
+    name: "Muxlislar faolligi",
+    value: "74%",
+    delta: "+12.4%",
+    target: "80%",
+    progress: 92,
+  },
+  {
+    code: "ARPU",
+    name: "Foydalanuvchi daromadi",
+    value: "128K",
+    delta: "+8.1%",
+    target: "150K",
+    progress: 85,
+  },
+  {
+    code: "ROI",
+    name: "Marketing ROI",
+    value: "142%",
+    delta: "+21%",
+    target: "120%",
+    progress: 100,
+  },
+  {
+    code: "RR",
+    name: "Retention Rate",
+    value: "81%",
+    delta: "+3.2%",
+    target: "85%",
+    progress: 95,
+  },
 ];
 
 const ROLES = [
@@ -239,9 +267,19 @@ const ROLES = [
 
 const RATING_ROWS = [
   { rank: 1, name: "Olimp sport klubi", type: "Professional klub", score: 87 },
-  { rank: 2, name: "Chempion fitness tarmog'i", type: "Fitness markaz", score: 81 },
+  {
+    rank: 2,
+    name: "Chempion fitness tarmog'i",
+    type: "Fitness markaz",
+    score: 81,
+  },
   { rank: 3, name: "Doston arena", type: "Sport majmuasi", score: 76 },
-  { rank: 4, name: "Yosh avlod sport maktabi", type: "Sport maktabi", score: 68 },
+  {
+    rank: 4,
+    name: "Yosh avlod sport maktabi",
+    type: "Sport maktabi",
+    score: 68,
+  },
   { rank: 5, name: "Vatan futbol akademiyasi", type: "Akademiya", score: 61 },
 ];
 
@@ -292,7 +330,10 @@ function Icon({ name }) {
     ),
     marketing: (
       <>
-        <path d="M4 11v3l3 .8V21l3-.6v-6l10 3V5L7 9.5 4 10z" strokeLinejoin="round" />
+        <path
+          d="M4 11v3l3 .8V21l3-.6v-6l10 3V5L7 9.5 4 10z"
+          strokeLinejoin="round"
+        />
       </>
     ),
     events: (
@@ -304,7 +345,10 @@ function Icon({ name }) {
     ),
     rating: (
       <>
-        <path d="m12 3 2.6 5.4 5.9.8-4.3 4.1 1 5.9-5.2-2.8-5.2 2.8 1-5.9L3.5 9.2l5.9-.8L12 3z" strokeLinejoin="round" />
+        <path
+          d="m12 3 2.6 5.4 5.9.8-4.3 4.1 1 5.9-5.2-2.8-5.2 2.8 1-5.9L3.5 9.2l5.9-.8L12 3z"
+          strokeLinejoin="round"
+        />
       </>
     ),
     dri: (
@@ -362,7 +406,14 @@ function Icon({ name }) {
     ),
   };
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      aria-hidden="true"
+    >
       {icons[name]}
     </svg>
   );
@@ -371,7 +422,13 @@ function Icon({ name }) {
 function BrandMark() {
   return (
     <span className="brand-mark" aria-hidden="true">
-      <svg viewBox="0 0 44 44" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
+      <svg
+        viewBox="0 0 44 44"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+      >
         <rect x="5" y="8" width="34" height="28" rx="5" />
         <path d="M22 8v28" />
         <circle cx="22" cy="22" r="6" />
@@ -389,7 +446,13 @@ function DriGauge() {
   const cy = 58 - 46 * Math.sin(rad);
   return (
     <svg className="gauge" viewBox="0 0 120 66" aria-hidden="true">
-      <path d="M14 58 A46 46 0 0 1 106 58" fill="none" stroke="var(--night-line)" strokeWidth="9" strokeLinecap="round" />
+      <path
+        d="M14 58 A46 46 0 0 1 106 58"
+        fill="none"
+        stroke="var(--night-line)"
+        strokeWidth="9"
+        strokeLinecap="round"
+      />
       <path
         d="M14 58 A46 46 0 0 1 106 58"
         fill="none"
@@ -400,14 +463,26 @@ function DriGauge() {
         strokeDashoffset={144.5 - (144.5 * value) / 100}
         className="gauge-arc"
       />
-      <circle cx={cx} cy={cy} r="4.4" fill="var(--volt)" stroke="var(--night-2)" strokeWidth="2.4" />
+      <circle
+        cx={cx}
+        cy={cy}
+        r="4.4"
+        fill="var(--volt)"
+        stroke="var(--night-2)"
+        strokeWidth="2.4"
+      />
     </svg>
   );
 }
 
 function Sparkline() {
   return (
-    <svg className="sparkline" viewBox="0 0 220 64" preserveAspectRatio="none" aria-hidden="true">
+    <svg
+      className="sparkline"
+      viewBox="0 0 220 64"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
       <defs>
         <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="var(--volt)" stopOpacity="0.35" />
@@ -439,7 +514,15 @@ function ForecastChart() {
         </linearGradient>
       </defs>
       {[0, 1, 2, 3].map((i) => (
-        <line key={i} x1="36" x2="452" y1={36 + i * 46} y2={36 + i * 46} stroke="var(--line)" strokeWidth="1" />
+        <line
+          key={i}
+          x1="36"
+          x2="452"
+          y1={36 + i * 46}
+          y2={36 + i * 46}
+          stroke="var(--line)"
+          strokeWidth="1"
+        />
       ))}
       <path
         d="M36 168 L120 152 L204 158 L288 128"
@@ -456,7 +539,10 @@ function ForecastChart() {
         strokeLinecap="round"
         strokeDasharray="7 7"
       />
-      <path d="M36 168 L120 152 L204 158 L288 128 L372 92 L452 54 V186 H36 Z" fill="url(#forecastFill)" />
+      <path
+        d="M36 168 L120 152 L204 158 L288 128 L372 92 L452 54 V186 H36 Z"
+        fill="url(#forecastFill)"
+      />
       {[
         [36, 168],
         [120, 152],
@@ -465,11 +551,34 @@ function ForecastChart() {
         [372, 92],
         [452, 54],
       ].map(([x, y], i) => (
-        <circle key={i} cx={x} cy={y} r="4.6" fill={i >= 3 ? "var(--volt-deep)" : "var(--pitch)"} stroke="var(--paper)" strokeWidth="2" />
+        <circle
+          key={i}
+          cx={x}
+          cy={y}
+          r="4.6"
+          fill={i >= 3 ? "var(--volt-deep)" : "var(--pitch)"}
+          stroke="var(--paper)"
+          strokeWidth="2"
+        />
       ))}
-      <line x1="288" y1="28" x2="288" y2="186" stroke="var(--ink)" strokeOpacity="0.22" strokeWidth="1.4" strokeDasharray="3 5" />
+      <line
+        x1="288"
+        y1="28"
+        x2="288"
+        y2="186"
+        stroke="var(--ink)"
+        strokeOpacity="0.22"
+        strokeWidth="1.4"
+        strokeDasharray="3 5"
+      />
       {["2025", "2026", "2027", "2028", "2029", "2030"].map((year, i) => (
-        <text key={year} x={36 + i * 83.2} y="206" textAnchor="middle" className="chart-label">
+        <text
+          key={year}
+          x={36 + i * 83.2}
+          y="206"
+          textAnchor="middle"
+          className="chart-label"
+        >
           {year}
         </text>
       ))}
@@ -489,7 +598,11 @@ export default function LandingPage() {
 
       <header className="site-header" data-header>
         <div className="container nav-shell">
-          <a className="brand" href="#top" aria-label="SportDigital bosh sahifa">
+          <a
+            className="brand"
+            href="#top"
+            aria-label="SportDigital bosh sahifa"
+          >
             <BrandMark />
             <span className="brand-copy">
               Sport<em>Digital</em>
@@ -505,10 +618,16 @@ export default function LandingPage() {
           </nav>
 
           <div className="nav-actions">
-            <Link className="button button--ghost button--small desktop-only" href="/login">
+            <Link
+              className="button button--ghost button--small desktop-only"
+              href="/login"
+            >
               Kirish
             </Link>
-            <a className="button button--volt button--small desktop-only" href="#demo">
+            <a
+              className="button button--volt button--small desktop-only"
+              href="#demo"
+            >
               Demo ko'rish
             </a>
             <button
@@ -561,17 +680,26 @@ export default function LandingPage() {
                 Sport tashkilotlari uchun raqamli boshqaruv platformasi
               </p>
               <h1>
-                Sport tashkiloti boshqaruvi — <span className="volt-text">yagona raqamli tabloda</span>
+                Sport tashkiloti boshqaruvi —{" "}
+                <span className="volt-text">yagona raqamli tabloda</span>
               </h1>
               <p className="hero-lead">
-                SportDigital xizmatlar, moliya, marketing va muxlislar faolligini real vaqtga yaqin
-                rejimda kuzatadi, raqamli rivojlanish indeksini hisoblaydi va rahbarga ma'lumotga
+                SportDigital xizmatlar, moliya, marketing va muxlislar
+                faolligini real vaqtga yaqin rejimda kuzatadi, raqamli
+                rivojlanish indeksini hisoblaydi va rahbarga ma'lumotga
                 asoslangan qarorlar uchun aniq tavsiyalar beradi.
               </p>
               <div className="hero-actions">
                 <a className="button button--volt" href="#demo">
                   Platformani ko'rish
-                  <svg viewBox="0 0 18 18" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                  <svg
+                    viewBox="0 0 18 18"
+                    aria-hidden="true"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                  >
                     <path d="M3.75 9h10.5M10 4.75 14.25 9 10 13.25" />
                   </svg>
                 </a>
@@ -606,7 +734,10 @@ export default function LandingPage() {
             </div>
 
             <div className="hero-board" data-reveal data-delay="150">
-              <article className="scoreboard" aria-label="Jonli monitoring namunasi">
+              <article
+                className="scoreboard"
+                aria-label="Jonli monitoring namunasi"
+              >
                 <header className="scoreboard-head">
                   <span className="scoreboard-title">Jonli monitoring</span>
                   <span className="scoreboard-live">
@@ -619,7 +750,9 @@ export default function LandingPage() {
                   <DriGauge />
                   <div className="scoreboard-dri-copy">
                     <span className="dri-value">68</span>
-                    <span className="dri-caption">DRI — raqamli rivojlanish indeksi</span>
+                    <span className="dri-caption">
+                      DRI — raqamli rivojlanish indeksi
+                    </span>
                     <span className="dri-band">Yuqori daraja</span>
                   </div>
                 </div>
@@ -653,7 +786,8 @@ export default function LandingPage() {
                 <div className="scoreboard-advice">
                   <span className="advice-tag">Tavsiya</span>
                   <p>
-                    E-chipta savdosi 18% oshdi — paketli xizmatlarni joriy etish maqsadga muvofiq.
+                    E-chipta savdosi 18% oshdi — paketli xizmatlarni joriy etish
+                    maqsadga muvofiq.
                   </p>
                 </div>
               </article>
@@ -669,7 +803,9 @@ export default function LandingPage() {
                 {TICKER_ITEMS.map((item) => (
                   <span className="ticker-item" key={`${copy}-${item.label}`}>
                     <strong>{item.label}</strong>
-                    <span className={`mono ticker-value ${item.trend === "up" ? "is-up" : ""}`}>
+                    <span
+                      className={`mono ticker-value ${item.trend === "up" ? "is-up" : ""}`}
+                    >
                       {item.value}
                     </span>
                   </span>
@@ -683,11 +819,14 @@ export default function LandingPage() {
         <section className="section section--chalk" id="platforma">
           <div className="container">
             <div className="section-head" data-reveal>
-              <span className="section-num" aria-hidden="true">01</span>
+              <span className="section-num" aria-hidden="true">
+                01
+              </span>
               <div>
                 <p className="section-tag">Nega SportDigital</p>
                 <h2>
-                  Sport tashkilotlarida raqamlar bor, <em>lekin ular gapirmaydi</em>
+                  Sport tashkilotlarida raqamlar bor,{" "}
+                  <em>lekin ular gapirmaydi</em>
                 </h2>
               </div>
             </div>
@@ -698,7 +837,14 @@ export default function LandingPage() {
                 <ul className="problem-list">
                   {PROBLEMS.map((problem) => (
                     <li key={problem}>
-                      <svg viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                      <svg
+                        viewBox="0 0 20 20"
+                        aria-hidden="true"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                      >
                         <path d="m6 6 8 8M14 6l-8 8" />
                       </svg>
                       {problem}
@@ -708,8 +854,14 @@ export default function LandingPage() {
               </div>
 
               <div className="problem-col" data-reveal data-delay="120">
-                <h3 className="col-title col-title--volt">SportDigital bilan</h3>
-                <div className="before-after" role="table" aria-label="Platformagacha va platformadan keyin taqqoslash">
+                <h3 className="col-title col-title--volt">
+                  SportDigital bilan
+                </h3>
+                <div
+                  className="before-after"
+                  role="table"
+                  aria-label="Platformagacha va platformadan keyin taqqoslash"
+                >
                   <div className="ba-row ba-row--head" role="row">
                     <span role="columnheader">Ko'rsatkich</span>
                     <span role="columnheader">Gacha</span>
@@ -724,8 +876,12 @@ export default function LandingPage() {
                   ].map(([metric, before, after]) => (
                     <div className="ba-row" role="row" key={metric}>
                       <span role="cell">{metric}</span>
-                      <span role="cell" className="ba-before">{before}</span>
-                      <span role="cell" className="ba-after">{after}</span>
+                      <span role="cell" className="ba-before">
+                        {before}
+                      </span>
+                      <span role="cell" className="ba-after">
+                        {after}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -738,7 +894,9 @@ export default function LandingPage() {
         <section className="section section--chalk section--chain">
           <div className="container">
             <div className="section-head" data-reveal>
-              <span className="section-num" aria-hidden="true">02</span>
+              <span className="section-num" aria-hidden="true">
+                02
+              </span>
               <div>
                 <p className="section-tag">Qiymat zanjiri</p>
                 <h2>
@@ -749,7 +907,12 @@ export default function LandingPage() {
 
             <ol className="chain-track">
               {CHAIN_STEPS.map((step, i) => (
-                <li className="chain-step" key={step.num} data-reveal data-delay={i * 70}>
+                <li
+                  className="chain-step"
+                  key={step.num}
+                  data-reveal
+                  data-delay={i * 70}
+                >
                   <span className="chain-num mono">{step.num}</span>
                   <h3>{step.title}</h3>
                   <p>{step.text}</p>
@@ -763,7 +926,9 @@ export default function LandingPage() {
         <section className="section section--night" id="modullar">
           <div className="container">
             <div className="section-head section-head--night" data-reveal>
-              <span className="section-num" aria-hidden="true">03</span>
+              <span className="section-num" aria-hidden="true">
+                03
+              </span>
               <div>
                 <p className="section-tag">Platforma modullari</p>
                 <h2>
@@ -775,12 +940,19 @@ export default function LandingPage() {
             {MODULE_GROUPS.map((group, gi) => (
               <div className="module-group" key={group.tag}>
                 <h3 className="module-group-tag" data-reveal>
-                  <span className="mono">{String(gi + 1).padStart(2, "0")}</span>
+                  <span className="mono">
+                    {String(gi + 1).padStart(2, "0")}
+                  </span>
                   {group.tag}
                 </h3>
                 <div className="module-grid">
                   {group.modules.map((mod, i) => (
-                    <article className="module-card" key={mod.title} data-reveal data-delay={i * 60}>
+                    <article
+                      className="module-card"
+                      key={mod.title}
+                      data-reveal
+                      data-delay={i * 60}
+                    >
                       <span className="module-icon">
                         <Icon name={mod.icon} />
                       </span>
@@ -798,7 +970,9 @@ export default function LandingPage() {
         <section className="section section--night section--dri" id="dri">
           <div className="container">
             <div className="section-head section-head--night" data-reveal>
-              <span className="section-num" aria-hidden="true">04</span>
+              <span className="section-num" aria-hidden="true">
+                04
+              </span>
               <div>
                 <p className="section-tag">Ilmiy o'lchov tizimi</p>
                 <h2>
@@ -813,12 +987,18 @@ export default function LandingPage() {
                   DRI = Σ ( W<sub>i</sub> × X<sub>i</sub> )
                 </p>
                 <p>
-                  Har bir tashkilot 12 ta indikator bo'yicha 0–100 ballda baholanadi: infratuzilmadan
-                  AI va IoT texnologiyalarigacha. Vaznli yig'indi tashkilotning umumiy raqamli
-                  rivojlanish darajasini beradi — bu dissertatsiyaning markaziy ilmiy instrumenti.
+                  Har bir tashkilot 12 ta indikator bo'yicha 0–100 ballda
+                  baholanadi: infratuzilmadan AI va IoT texnologiyalarigacha.
+                  Vaznli yig'indi tashkilotning umumiy raqamli rivojlanish
+                  darajasini beradi — bu dissertatsiyaning markaziy ilmiy
+                  instrumenti.
                 </p>
 
-                <div className="dri-scale" role="img" aria-label="DRI shkalasi: 0 dan 100 gacha besh daraja, joriy qiymat 68">
+                <div
+                  className="dri-scale"
+                  role="img"
+                  aria-label="DRI shkalasi: 0 dan 100 gacha besh daraja, joriy qiymat 68"
+                >
                   <div className="dri-scale-bar">
                     <span className="zone zone-1"></span>
                     <span className="zone zone-2"></span>
@@ -854,7 +1034,10 @@ export default function LandingPage() {
                     <li key={ind.label}>
                       <span className="ind-label">{ind.label}</span>
                       <span className="ind-bar" aria-hidden="true">
-                        <span className="ind-fill" style={{ width: `${ind.value}%` }}></span>
+                        <span
+                          className="ind-fill"
+                          style={{ width: `${ind.value}%` }}
+                        ></span>
                       </span>
                       <span className="ind-value mono">{ind.value}</span>
                     </li>
@@ -866,21 +1049,28 @@ export default function LandingPage() {
             <div className="kpi-strip" data-reveal>
               <div className="kpi-strip-head">
                 <h3>KPI monitoring</h3>
-                <p>Har bir ko'rsatkich — joriy qiymat, o'zgarish, maqsad va bajarilish darajasi bilan.</p>
+                <p>
+                  Har bir ko'rsatkich — joriy qiymat, o'zgarish, maqsad va
+                  bajarilish darajasi bilan.
+                </p>
               </div>
               <div className="kpi-cards">
                 {KPI_CARDS.map((kpi) => (
                   <article className="kpi-card" key={kpi.code}>
                     <div className="kpi-card-top">
                       <span className="kpi-code mono">{kpi.code}</span>
-                      <span className="kpi-delta">▲ {kpi.delta.replace("+", "")}</span>
+                      <span className="kpi-delta">
+                        ▲ {kpi.delta.replace("+", "")}
+                      </span>
                     </div>
                     <span className="kpi-value">{kpi.value}</span>
                     <span className="kpi-name">{kpi.name}</span>
                     <div className="kpi-progress" aria-hidden="true">
                       <span style={{ width: `${kpi.progress}%` }}></span>
                     </div>
-                    <span className="kpi-target mono">Maqsad: {kpi.target}</span>
+                    <span className="kpi-target mono">
+                      Maqsad: {kpi.target}
+                    </span>
                   </article>
                 ))}
               </div>
@@ -892,24 +1082,39 @@ export default function LandingPage() {
         <section className="section section--chalk" id="rollar">
           <div className="container">
             <div className="section-head" data-reveal>
-              <span className="section-num" aria-hidden="true">05</span>
+              <span className="section-num" aria-hidden="true">
+                05
+              </span>
               <div>
                 <p className="section-tag">Foydalanuvchi rollari</p>
                 <h2>
-                  Har bir rol <em>o'z qarori uchun kerakli ma'lumotni</em> ko'radi
+                  Har bir rol <em>o'z qarori uchun kerakli ma'lumotni</em>{" "}
+                  ko'radi
                 </h2>
               </div>
             </div>
 
             <div className="roles-grid">
               {ROLES.map((role, i) => (
-                <article className="role-card" key={role.title} data-reveal data-delay={i * 70}>
+                <article
+                  className="role-card"
+                  key={role.title}
+                  data-reveal
+                  data-delay={i * 70}
+                >
                   <span className="role-badge">{role.badge}</span>
                   <h3>{role.title}</h3>
                   <ul>
                     {role.points.map((point) => (
                       <li key={point}>
-                        <svg viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                        <svg
+                          viewBox="0 0 20 20"
+                          aria-hidden="true"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        >
                           <path d="m4.5 10.5 3.5 3.5 7.5-8" />
                         </svg>
                         {point}
@@ -923,10 +1128,15 @@ export default function LandingPage() {
         </section>
 
         {/* ===================== FORECAST + RATING ===================== */}
-        <section className="section section--chalk section--results" id="natijalar">
+        <section
+          className="section section--chalk section--results"
+          id="natijalar"
+        >
           <div className="container">
             <div className="section-head" data-reveal>
-              <span className="section-num" aria-hidden="true">06</span>
+              <span className="section-num" aria-hidden="true">
+                06
+              </span>
               <div>
                 <p className="section-tag">Prognoz va reyting</p>
                 <h2>
@@ -939,16 +1149,23 @@ export default function LandingPage() {
               <article className="panel panel--forecast" data-reveal>
                 <div className="panel-head">
                   <h3>Raqamli daromad prognozi</h3>
-                  <span className="mono panel-note">2026–2030 · regressiya modeli</span>
+                  <span className="mono panel-note">
+                    2026–2030 · regressiya modeli
+                  </span>
                 </div>
                 <ForecastChart />
                 <p className="panel-caption">
-                  Chiziqli va ko'p omilli regressiya, vaqt qatorlari va trend modellari asosida
-                  daromad, faollik hamda DRI ko'rsatkichlari prognoz qilinadi.
+                  Chiziqli va ko'p omilli regressiya, vaqt qatorlari va trend
+                  modellari asosida daromad, faollik hamda DRI ko'rsatkichlari
+                  prognoz qilinadi.
                 </p>
               </article>
 
-              <article className="panel panel--rating" data-reveal data-delay="120">
+              <article
+                className="panel panel--rating"
+                data-reveal
+                data-delay="120"
+              >
                 <div className="panel-head">
                   <h3>TOP raqamlashtirilgan tashkilotlar</h3>
                   <span className="mono panel-note">DRI bo'yicha</span>
@@ -971,8 +1188,8 @@ export default function LandingPage() {
                   ))}
                 </ol>
                 <p className="panel-caption">
-                  Tashkilotlar iqtisodiy samaradorlik, raqamli rivojlanish va muxlislar faolligi
-                  bo'yicha yagona reytingda taqqoslanadi.
+                  Tashkilotlar iqtisodiy samaradorlik, raqamli rivojlanish va
+                  muxlislar faolligi bo'yicha yagona reytingda taqqoslanadi.
                 </p>
               </article>
             </div>
@@ -983,8 +1200,18 @@ export default function LandingPage() {
         <section className="security-strip">
           <div className="container security-inner" data-reveal>
             <span className="security-title">
-              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-                <path d="M12 3 5 6v5c0 4.4 2.9 8.2 7 9.4 4.1-1.2 7-5 7-9.4V6l-7-3z" strokeLinejoin="round" />
+              <svg
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+              >
+                <path
+                  d="M12 3 5 6v5c0 4.4 2.9 8.2 7 9.4 4.1-1.2 7-5 7-9.4V6l-7-3z"
+                  strokeLinejoin="round"
+                />
                 <path d="m8.8 11.8 2.2 2.2 4.2-4.6" />
               </svg>
               Axborot xavfsizligi
@@ -1007,13 +1234,20 @@ export default function LandingPage() {
               bugun boshlang
             </h2>
             <p className="cta-lead">
-              Sport tashkilotingiz ma'lumotlarini yagona tizimga jamlang va boshqaruv qarorlarini
-              raqamlarga tayangan holda qabul qiling.
+              Sport tashkilotingiz ma'lumotlarini yagona tizimga jamlang va
+              boshqaruv qarorlarini raqamlarga tayangan holda qabul qiling.
             </p>
             <div className="cta-actions">
               <a className="button button--dark" href="#top">
                 Demo so'rash
-                <svg viewBox="0 0 18 18" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                <svg
+                  viewBox="0 0 18 18"
+                  aria-hidden="true"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                >
                   <path d="M3.75 9h10.5M10 4.75 14.25 9 10 13.25" />
                 </svg>
               </a>
@@ -1028,15 +1262,19 @@ export default function LandingPage() {
       <footer className="site-footer">
         <div className="container footer-grid">
           <div className="footer-brand">
-            <a className="brand" href="#top" aria-label="SportDigital bosh sahifa">
+            <a
+              className="brand"
+              href="#top"
+              aria-label="SportDigital bosh sahifa"
+            >
               <BrandMark />
               <span className="brand-copy">
                 Sport<em>Digital</em>
               </span>
             </a>
             <p>
-              Sport tashkilotlarining raqamli rivojlanishini boshqarish, monitoring qilish va tahlil
-              etish axborot platformasi.
+              Sport tashkilotlarining raqamli rivojlanishini boshqarish,
+              monitoring qilish va tahlil etish axborot platformasi.
             </p>
           </div>
 
@@ -1058,8 +1296,9 @@ export default function LandingPage() {
           <div className="footer-col">
             <h3>Loyiha haqida</h3>
             <p className="footer-note">
-              Platforma «Raqamli transformatsiya sharoitida sport tashkilotlarining yangi biznes
-              modellarini ishlab chiqish» mavzusidagi PhD tadqiqoti doirasida ishlab chiqilmoqda.
+              Platforma «Raqamli transformatsiya sharoitida sport
+              tashkilotlarining yangi biznes modellarini ishlab chiqish»
+              mavzusidagi PhD tadqiqoti doirasida ishlab chiqilmoqda.
             </p>
           </div>
         </div>

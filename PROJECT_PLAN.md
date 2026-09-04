@@ -104,8 +104,11 @@ AI-BPM Monitor (iliq ivory + ember) va standart AI-ko'k/binafsha gradientlardan 
 ### Phase 3 — Asosiy ekranlar (mock data bilan)
 
 - [x] Rahbar Dashboard: 4 stat karta (sparkline), interaktiv daromad grafigi (hover tooltip), DRI gauge, daromad manbalari, KPI jadvali, Decision Support tavsiyalari, muxlislar segmentlari — kun/hafta/oy/chorak/yil filtrlari bilan.
-- [ ] Tashkilotlar reyestri (jadval + detail).
-- [ ] Xizmatlar, CRM/segmentlar, Marketing (ROI), Moliya.
+- [x] Tashkilotlar reyestri (jadval + detail).
+- [x] Sport xizmatlari (katalog + detail).
+- [x] Muxlislar / CRM (segmentlar + reyestr + profil).
+- [x] Marketing: 8 kanal samaradorligi, ROI formulasi (avtomatik), oylik xarajat/daromad grafigi, kampaniyalar reyestri, konversiya voronkasi.
+- [x] Moliya: 11 daromad manbasi, xarajat tarkibi, sof foyda grafigi, rentabellik, ARPU, o'rtacha tranzaksiya, raqamli ulush, operatsiyalar reyestri.
 - [ ] DRI hisoblagich sahifasi (indikator ballari → indeks).
 - [ ] KPI monitoring, Analitika, Prognoz (2026–2030), Reyting TOP-10.
 - [ ] Decision Support tavsiyalar, Hisobotlar (PDF/Excel/CSV eksport UI).
