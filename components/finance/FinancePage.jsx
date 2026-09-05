@@ -24,6 +24,11 @@ import {
   totalRevenue,
 } from "@/lib/mock/finance";
 
+import { useDemo } from "@/components/demo/DemoProvider";
+import { legacyFinance } from "@/lib/demo/legacy.mjs";
+import { SaleButtons, TransactionActions } from "@/components/demo/LegacyFinanceControls";
+import { PeriodControl } from "@/components/demo/Common";
+import { downloadReport } from "@/components/demo/ReportsPage";
 const PAGE_SIZE = 8;
 
 function Icon({ name }) {
@@ -168,7 +173,7 @@ function ProfitChart({ revenue, expense }) {
   const { W, H, padL, padR, padT, padB } = CHART;
   const innerW = W - padL - padR;
   const innerH = H - padT - padB;
-  const max = Math.ceil(Math.max(...revenue) / 400) * 400;
+  const max = Math.max(1, ...revenue, ...expense) * 1.2;
   const n = revenue.length;
   const x = (i) => padL + (i / (n - 1)) * innerW;
   const y = (v) => padT + innerH - (v / max) * innerH;
@@ -260,6 +265,9 @@ function ProfitChart({ revenue, expense }) {
 /* ---------- Sahifa ---------- */
 
 export default function FinancePage() {
+  const {state,dispatch}=useDemo();
+  const {totalRevenue,totalExpense,netProfit,profitability,digitalRevenue,digitalShare,arpu,averageTransaction,FINANCE_METRICS,REVENUE_SOURCES,EXPENSE_CATEGORIES,FINANCE_TREND,TRANSACTIONS,PAYMENT_METHODS,FINANCE_ORGANIZATIONS}=useMemo(()=>legacyFinance(state),[state]);
+  const exportReport=()=>{const next=dispatch({type:'report',kind:'finance',id:crypto.randomUUID()});downloadReport(next.reports[0]);};
   const [query, setQuery] = useState("");
   const [type, setType] = useState("all");
   const [method, setMethod] = useState("all");
@@ -274,14 +282,14 @@ export default function FinancePage() {
   const expenseChange = calcChange(totalExpense, FINANCE_METRICS.previousExpense);
   const previousProfit = FINANCE_METRICS.previousRevenue - FINANCE_METRICS.previousExpense;
   const profitChange = calcChange(netProfit, previousProfit);
-  const previousProfitability = (previousProfit / FINANCE_METRICS.previousRevenue) * 100;
+  const previousProfitability = (previousProfit / (FINANCE_METRICS.previousRevenue || 1)) * 100;
 
   const sortedSources = useMemo(
     () => [...REVENUE_SOURCES].sort((a, b) => b.amount - a.amount),
-    [],
+    [REVENUE_SOURCES],
   );
-  const maxSource = sortedSources[0].amount;
-  const maxExpense = EXPENSE_CATEGORIES[0].amount;
+  const maxSource = Math.max(.000001,sortedSources[0]?.amount || 0);
+  const maxExpense = Math.max(.000001,EXPENSE_CATEGORIES[0]?.amount || 0);
   const traditionalRevenue = totalRevenue - digitalRevenue;
 
   const filtered = useMemo(() => {
@@ -303,7 +311,7 @@ export default function FinancePage() {
       if (sort === "category") return left.category.localeCompare(right.category, "uz");
       return 0;
     });
-  }, [query, type, method, organization, sort]);
+  }, [query, type, method, organization, sort, TRANSACTIONS]);
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Math.min(page, pageCount);
@@ -332,12 +340,14 @@ export default function FinancePage() {
           <h1>Moliyaviy ko'rsatkichlar</h1>
           <p>Daromad manbalari, xarajatlar tarkibi va monetizatsiya samaradorligini tahlil qiling.</p>
         </div>
-        <button type="button" className="org-primary-button">
+        <div className="legacy-inline-actions"><SaleButtons />
+        <button type="button" className="org-primary-button" onClick={exportReport}>
           <Icon name="download" />
           Hisobotni yuklash
-        </button>
+        </button></div>
       </header>
 
+      <PeriodControl />
       <section className="org-summary-grid" aria-label="Moliyaviy umumiy ko'rsatkichlar">
         <SummaryCard
           icon="revenue"
@@ -349,7 +359,7 @@ export default function FinancePage() {
           icon="expense"
           label="Jami xarajat"
           value={formatMln(totalExpense)}
-          note={`daromadning ${formatFixed((totalExpense / totalRevenue) * 100, 0)}%i`}
+          note={`daromadning ${formatFixed((totalExpense / (totalRevenue || 1)) * 100, 0)}%i`}
         />
         <SummaryCard
           icon="profit"
@@ -478,7 +488,7 @@ export default function FinancePage() {
                     {item.kind === "digital" ? "Raqamli" : "An'anaviy"}
                   </span>
                   <span className="fin-source-share mono">
-                    {formatFixed((item.amount / totalRevenue) * 100, 1)}%
+                    {formatFixed((item.amount / (totalRevenue || 1)) * 100, 1)}%
                   </span>
                 </div>
               </li>
@@ -503,7 +513,7 @@ export default function FinancePage() {
                 </span>
                 <span className="fin-expense-amount mono">{formatMln(item.amount)}</span>
                 <span className="fin-expense-share mono">
-                  {formatFixed((item.amount / totalExpense) * 100, 0)}%
+                  {formatFixed((item.amount / (totalExpense || 1)) * 100, 0)}%
                 </span>
               </li>
             ))}
@@ -717,12 +727,13 @@ export default function FinancePage() {
         ) : null}
       </section>
 
-      <TransactionDetail transaction={selected} onClose={closeDetail} />
+      <TransactionDetail transaction={selected} onClose={closeDetail} totals={{totalRevenue,totalExpense}} />
     </div>
   );
 }
 
-function TransactionDetail({ transaction, onClose }) {
+function TransactionDetail({ transaction, onClose, totals }) {
+  const {totalRevenue,totalExpense}=totals;
   if (!transaction) return null;
   const isIncome = transaction.type === "income";
 
@@ -734,10 +745,11 @@ function TransactionDetail({ transaction, onClose }) {
       subtitle={`${transaction.id} · ${transaction.category}`}
       size="medium"
       icon={<Icon name={isIncome ? "revenue" : "expense"} />}
-      footer={
+      footer={<>
+        <TransactionActions transaction={transaction} onClose={onClose} />
         <button type="button" className="org-secondary-button" onClick={onClose}>
           Yopish
-        </button>
+        </button></>
       }
     >
       <div className="fin-detail">
@@ -748,7 +760,7 @@ function TransactionDetail({ transaction, onClose }) {
             {formatFixed(transaction.amount, 1)} mln so'm
           </strong>
           <small>
-            {transaction.status === "pending" ? "To'lov kutilmoqda" : "Amalga oshirilgan"}
+            {transaction.status === "cancelled" ? "Bekor qilingan" : transaction.status === "pending" ? "To'lov kutilmoqda" : "Amalga oshirilgan"}
           </small>
         </div>
 

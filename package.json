@@ -6,11 +6,17 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "test": "node --test tests/demo-model.test.mjs",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "next": "16.3.2",
     "react": "19.2.8",
     "react-dom": "19.2.8"
-  }
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1"
+  },
+  "type": "module"
 }

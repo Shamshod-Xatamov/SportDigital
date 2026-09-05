@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
+import {useDemo} from "@/components/demo/DemoProvider";
+import {driValue} from "@/lib/demo/model.mjs";
 
 import Drawer from "@/components/ui/Drawer";
 import {
@@ -168,11 +170,18 @@ function DistributionChart({ ranking, hovered, onHover }) {
    ============================================================ */
 
 export default function RatingPage() {
+  const {state}=useDemo();
   const [hovered, setHovered] = useState(null);
   const [selected, setSelected] = useState(null);
   const closeDetail = useCallback(() => setSelected(null), []);
 
-  const ranking = useMemo(() => buildRanking(), []);
+  const ranking = useMemo(() => buildRanking().map(row=>{
+    const live=state.organizations.find(o=>o.id===row.org.id || o.name===row.org.name);
+    if(!live)return row;
+    const scores={...row.org.scores,digital:driValue(state,live.id)};
+    const score=CRITERIA.reduce((n,c)=>n+scores[c.id]*c.weight,0);
+    return {...row,org:{...row.org,name:live.name,scores},score,scoreChange:score-row.org.history.at(-1)};
+  }).sort((a,b)=>b.score-a.score).map((r,i)=>({...r,rank:i+1,rankChange:r.previousRank-i-1,ranks:[...r.ranks.slice(0,-1),i+1]})), [state]);
   const top = ranking.slice(0, TOP_N);
   const podium = ranking.slice(0, 3);
   const currentPeriod = RATING_PERIODS[RATING_PERIODS.length - 1];

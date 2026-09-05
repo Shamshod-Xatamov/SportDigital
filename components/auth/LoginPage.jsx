@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { useDemo } from "@/components/demo/DemoProvider";
+
 function BrandMark() {
   return (
     <span className="brand-mark" aria-hidden="true">
@@ -35,6 +37,7 @@ const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
 
 export default function LoginPage() {
   const router = useRouter();
+  const { ready, dispatch, storageError, corrupt, reset } = useDemo();
   const [mode, setMode] = useState("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -48,8 +51,9 @@ export default function LoginPage() {
     setStatus("idle");
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    if (!ready || corrupt || status === "loading") return;
     const nextErrors = {};
 
     if (!email.trim()) {
@@ -65,14 +69,33 @@ export default function LoginPage() {
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
+    if (mode === "reset") { setStatus("done"); return; }
     setStatus("loading");
-    window.setTimeout(() => {
-      if (mode === "login") {
-        router.push("/dashboard");
-      } else {
-        setStatus("done");
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim(), password }),
+      });
+      const result = await response.json();
+
+      if (!response.ok) {
+        setErrors({ form: result.error ?? "Kirish amalga oshmadi." });
+        setStatus("idle");
+        return;
       }
-    }, 700);
+
+      dispatch({ type: "login", profileId: result.profileId });
+      router.push("/dashboard");
+    } catch (error) {
+      setErrors({
+        form:
+          error instanceof Error
+            ? error.message
+            : "Kirish vaqtida xatolik yuz berdi.",
+      });
+      setStatus("idle");
+    }
   };
 
   return (
@@ -98,11 +121,11 @@ export default function LoginPage() {
                   <path d="m5 12.5 4.5 4.5L19 7.5" />
                 </svg>
               </span>
-              <h1>{mode === "login" ? "Kirish tasdiqlandi" : "Havola yuborildi"}</h1>
+              <h1>{mode === "login" ? "Kirish tasdiqlandi" : "Demo rejim"}</h1>
               <p>
                 {mode === "login"
                   ? "Demo rejim: boshqaruv paneli keyingi bosqichda ulanadi."
-                  : `Ko'rsatmalar ${email} manziliga yuborildi.`}
+                  : "Parolni tiklash demo rejimida yuborilmaydi. Kirish sahifasidagi demo hisobdan foydalaning."}
               </p>
               <button type="button" className="auth-secondary-button" onClick={() => switchMode("login")}>
                 Ortga qaytish
@@ -123,7 +146,14 @@ export default function LoginPage() {
                 </p>
               </div>
 
+              {storageError && <p className="demo-warning" role="alert">{storageError}</p>}
+              {corrupt && <button className="auth-secondary-button" onClick={() => { if (window.confirm("Demo ma’lumotlari tiklansinmi?")) reset(); }}>Demoni tiklash</button>}
               <form className="auth-form" onSubmit={handleSubmit} noValidate>
+                {errors.form ? (
+                  <p className="field-error" role="alert">
+                    {errors.form}
+                  </p>
+                ) : null}
                 <div className="field">
                   <label htmlFor="email">Elektron pochta</label>
                   <input
@@ -195,7 +225,7 @@ export default function LoginPage() {
                   </button>
                 ) : null}
 
-                <button className="auth-submit" type="submit" disabled={status === "loading"}>
+                <button className="auth-submit" type="submit" disabled={!ready || corrupt || status === "loading"}>
                   {status === "loading" ? (
                     <>
                       <span className="spinner" aria-hidden="true" />

@@ -1,8 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+
+import { useDemo } from "@/components/demo/DemoProvider";
+import { canVisit, homeFor, ROLES } from "@/lib/demo/model.mjs";
 
 function BrandMark() {
   return (
@@ -137,6 +140,7 @@ const NAV_GROUPS = [
   {
     label: "Auditoriya va daromad",
     items: [
+      { href: "/arizalar", icon: "fans", label: "Arizalar", ready: true },
       { href: "/muxlislar", icon: "fans", label: "Muxlislar / CRM", ready: true },
       { href: "/marketing", icon: "marketing", label: "Marketing", ready: true },
       { href: "/moliya", icon: "finance", label: "Moliya", ready: true },
@@ -207,6 +211,8 @@ function useDismissableMenu(open, setOpen) {
 }
 
 function WorkspaceSwitcher({ workspaceId, onChange }) {
+  const { state, profile } = useDemo();
+  const WORKSPACES = state.organizations.filter(o => o.status === 'active' && (profile.role === 'super' || o.id === profile.organizationId)).map(o => ({ ...o, meta: o.region, initials: o.name.split(' ').map(w => w[0]).slice(0,2).join('') }));
   const [open, setOpen] = useState(false);
   const rootRef = useDismissableMenu(open, setOpen);
   const workspace = WORKSPACES.find((item) => item.id === workspaceId) ?? WORKSPACES[0];
@@ -267,6 +273,9 @@ function WorkspaceSwitcher({ workspaceId, onChange }) {
 }
 
 function AccountMenu() {
+  const { state, profile, dispatch } = useDemo();
+  const router = useRouter();
+  const initials = profile.name.split(' ').map(w => w[0]).slice(0,2).join('');
   const [open, setOpen] = useState(false);
   const rootRef = useDismissableMenu(open, setOpen);
 
@@ -279,10 +288,10 @@ function AccountMenu() {
         aria-expanded={open}
         onClick={() => setOpen((current) => !current)}
       >
-        <span className="app-user-avatar" aria-hidden="true">AK</span>
+        <span className="app-user-avatar" aria-hidden="true">{initials}</span>
         <span className="app-user-copy">
-          <strong>Aziz Karimov</strong>
-          <small>Rahbar</small>
+          <strong>{profile.name}</strong>
+          <small>{ROLES[profile.role]}</small>
         </span>
         <NavIcon name="chevronDown" />
       </button>
@@ -290,13 +299,18 @@ function AccountMenu() {
       {open ? (
         <div className="app-account-dropdown" role="menu" aria-label="Foydalanuvchi menyusi">
           <div className="app-account-card">
-            <span className="app-user-avatar" aria-hidden="true">AK</span>
+            <span className="app-user-avatar" aria-hidden="true">{initials}</span>
             <span>
-              <strong>Aziz Karimov</strong>
-              <small>aziz.karimov@olimpsk.uz</small>
+              <strong>{profile.name}</strong>
+              <small>{profile.id}@sportdigital.uz</small>
             </span>
           </div>
-          <span className="app-account-role">Rahbar kabineti</span>
+          <span className="app-account-role">{ROLES[profile.role]} kabineti</span>
+          <label className="legacy-role-select">Demo profil
+            <select aria-label="Demo rolni almashtirish" value={profile.id} onChange={event => { const p = state.profiles.find(p => p.id === event.target.value); dispatch({ type: 'login', profileId: p.id }); setOpen(false); router.push(homeFor(p.role)); }}>
+              {state.profiles.map(p => <option key={p.id} value={p.id}>{ROLES[p.role]}</option>)}
+            </select>
+          </label>
           <Link href="/sozlamalar" role="menuitem" onClick={() => setOpen(false)}>
             <NavIcon name="user" />
             Hisob va profil
@@ -306,7 +320,7 @@ function AccountMenu() {
             Sozlamalar
           </Link>
           <div className="app-account-divider"></div>
-          <Link className="is-danger" href="/login" role="menuitem" onClick={() => setOpen(false)}>
+          <Link className="is-danger" href="/login" role="menuitem" onClick={() => { dispatch({ type: "logout" }); setOpen(false); }}>
             <NavIcon name="logout" />
             Tizimdan chiqish
           </Link>
@@ -317,9 +331,12 @@ function AccountMenu() {
 }
 
 function SidebarNav({ pathname, onNavigate }) {
+  const { profile } = useDemo();
+  const navigation = profile.role === 'fan' ? [{ label: 'Mening kabinetim', items: [{ href: '/katalog', icon: 'services', label: 'Xizmatlar katalogi', ready: true }, { href: '/arizalarim', icon: 'fans', label: 'Mening arizalarim', ready: true }, { href: '/sozlamalar', icon: 'settings', label: 'Sozlamalar', ready: true }] }] : NAV_GROUPS;
+  const groups = navigation.map(g => ({ ...g, items: g.items.filter(i => canVisit(profile.role, i.href)) })).filter(g => g.items.length);
   return (
     <nav className="app-nav" aria-label="Platforma bo'limlari">
-      {NAV_GROUPS.map((group) => (
+      {groups.map((group) => (
         <div className="app-nav-group" key={group.label}>
           <p className="app-nav-label">{group.label}</p>
           {group.items.map((item) =>
@@ -356,7 +373,9 @@ function SidebarNav({ pathname, onNavigate }) {
 export default function AppShell({ children }) {
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [workspaceId, setWorkspaceId] = useState("olimp");
+  const { state, profile, organizationId, dispatch, notice, setNotice, storageError } = useDemo();
+  const workspaceId = organizationId;
+  const setWorkspaceId = id => { if (profile.role === 'super') dispatch({ type: 'workspace', id }); };
   const currentPage =
     NAV_GROUPS.flatMap((group) => group.items).find((item) => pathname === item.href)?.label ??
     "Rahbar paneli";
@@ -409,9 +428,7 @@ export default function AppShell({ children }) {
             Sport<em>Digital</em>
           </span>
         </Link>
-        <span className="app-user-avatar" aria-hidden="true">
-          AK
-        </span>
+        <AccountMenu />
       </header>
 
       {drawerOpen ? (
@@ -446,7 +463,7 @@ export default function AppShell({ children }) {
           </nav>
 
           <div className="app-topbar-actions">
-            <button type="button" className="app-icon-button" aria-label="Bildirishnomalar">
+            <button type="button" className="app-icon-button" aria-label="Bildirishnomalar" onClick={() => setNotice(`${state.applications.filter(a => a.organizationId === organizationId && a.status === "pending").length} ta ariza javob kutmoqda.`)}>
               <NavIcon name="bell" />
               <span aria-hidden="true"></span>
             </button>
@@ -454,7 +471,11 @@ export default function AppShell({ children }) {
           </div>
         </header>
 
-        <main className="app-content">{children}</main>
+        <main className="app-content">
+          {storageError && <p className="demo-warning" role="alert">{storageError}</p>}
+          {notice && <div className="app-toast" role="status"><span>{notice}</span><button type="button" aria-label="Xabarni yopish" onClick={() => setNotice('')}>×</button></div>}
+          <div key={`${profile.id}:${organizationId}:${pathname}`}>{children}</div>
+        </main>
       </section>
     </div>
   );

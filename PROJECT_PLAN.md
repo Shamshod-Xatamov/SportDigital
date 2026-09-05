@@ -1,5 +1,7 @@
 # SportDigital — UI/UX Implementation Plan
 
+> 2026-09-05: backendsiz interaktiv demo bosqichi bajarildi. Joriy imkoniyatlar va tekshiruvlar [DEMO_IMPLEMENTATION_PLAN.md](DEMO_IMPLEMENTATION_PLAN.md), foydalanish tartibi [DEMO_GUIDE.md](DEMO_GUIDE.md) fayllarida. Quyidagi bosqichlar dastlabki UI ishlari tarixini ham saqlaydi.
+
 ## 1. TZ tahlili — mahsulotni tushunish
 
 SportDigital — sport tashkilotlarining raqamli transformatsiyasini boshqarish, monitoring qilish va tahlil etish platformasi. PhD dissertatsiya (08.00.16 — Raqamli iqtisodiyot) doirasida ishlab chiqiladi, ya'ni platforma bir vaqtning o'zida **amaliy boshqaruv vositasi** va **ilmiy-tadqiqot instrumenti** bo'lishi kerak.

@@ -2,6 +2,8 @@
 
 import { useCallback, useMemo, useState } from "react";
 
+import { useLegacyRecords } from "@/components/demo/useLegacy";
+import LegacyRowActions from "@/components/demo/LegacyRowActions";
 import Drawer from "@/components/ui/Drawer";
 import {
   CRM_METRICS,
@@ -9,7 +11,7 @@ import {
   FAN_CHANNELS,
   FAN_ORGANIZATIONS,
   FAN_REGIONS,
-  FAN_SEGMENTS,
+  FAN_SEGMENTS as BASE_FAN_SEGMENTS,
   getFanSegment,
 } from "@/lib/mock/fans";
 
@@ -170,7 +172,8 @@ function ScoreBar({ value, label }) {
 }
 
 export default function CrmPage() {
-  const [fans, setFans] = useState(FANS);
+  const { rows: fans, save: saveRecord, canEdit, organization: currentOrganization } = useLegacyRecords("customers");
+  const [formError, setFormError] = useState("");
   const [query, setQuery] = useState("");
   const [segment, setSegment] = useState("all");
   const [channel, setChannel] = useState("all");
@@ -183,8 +186,9 @@ export default function CrmPage() {
 
   const closeDetail = useCallback(() => setSelected(null), []);
   const closeForm = useCallback(() => setFormOpen(false), []);
-  const addedFans = Math.max(0, fans.length - FANS.length);
-  const totalFans = CRM_METRICS.total + addedFans;
+  const FAN_SEGMENTS=BASE_FAN_SEGMENTS.map(s=>({...s,count:fans.filter(f=>f.segment===s.id).length}));
+  const addedFans = 0;
+  const totalFans = fans.length;
   const activeFans = FAN_SEGMENTS[0].count + FAN_SEGMENTS[1].count;
 
   const segmentCounts = useMemo(
@@ -245,7 +249,8 @@ export default function CrmPage() {
   };
 
   const openCreate = () => {
-    setForm(EMPTY_FORM);
+    setForm({ ...EMPTY_FORM, organization: currentOrganization?.name });
+    setFormError("");
     setFormOpen(true);
   };
 
@@ -279,7 +284,8 @@ export default function CrmPage() {
       consent: form.consent === "yes",
       scores: { visits: 50, purchases: 50, digital: 50, feedback: 50 },
     };
-    setFans((current) => [next, ...current]);
+    next.id = form.id || crypto.randomUUID();
+    try { saveRecord(next); } catch (error) { setFormError(error.message); return; }
     setFormOpen(false);
     setSelected(next);
   };
@@ -292,7 +298,7 @@ export default function CrmPage() {
           <h1>Muxlislar va CRM</h1>
           <p>Muxlislar faolligi, segmentlari va tashkilot bilan barcha aloqalarini boshqaring.</p>
         </div>
-        <button type="button" className="org-primary-button" onClick={openCreate}>
+        <button type="button" className="org-primary-button" onClick={openCreate} disabled={!canEdit} title={!canEdit ? "Bu amal uchun administrator huquqi kerak" : undefined}>
           <Icon name="plus" />
           Muxlis qo'shish
         </button>
@@ -478,13 +484,14 @@ export default function CrmPage() {
                   </td>
                   <td className="crm-cell-joined" data-label="Qo'shilgan">{fan.joinedAt}</td>
                   <td className="org-cell-action crm-cell-action">
-                    <button
+                    {!canEdit && <button
                       type="button"
                       aria-label={`${fan.name} profilini ko'rish`}
                       onClick={() => setSelected(fan)}
                     >
                       <Icon name="arrow" />
-                    </button>
+                    </button>}
+                      {canEdit && <LegacyRowActions onView={() => setSelected(fan)} collection="customers" row={fan} onEdit={row => { setForm({ ...row, consent:row.consent?'yes':'no' }); setSelected(null); setFormError(''); setFormOpen(true); }} />}
                   </td>
                 </tr>
               ))}
@@ -556,6 +563,7 @@ export default function CrmPage() {
         }
       >
         <form id="fan-create-form" className="org-form" onSubmit={createFan}>
+          {formError && <p className="demo-warning" role="alert">{formError}</p>}
           <div className="org-form-section">
             <h3>Shaxsiy ma'lumotlar</h3>
             <p>Muxlis bilan bog'lanish va profilni aniqlash uchun.</p>
@@ -589,7 +597,7 @@ export default function CrmPage() {
             <label className="org-form-field">
               <span>Tashkilot</span>
               <select name="organization" value={form.organization} onChange={updateForm}>
-                {FAN_ORGANIZATIONS.map((item) => <option key={item}>{item}</option>)}
+                {[currentOrganization.name].map((item) => <option key={item}>{item}</option>)}
               </select>
             </label>
           </div>

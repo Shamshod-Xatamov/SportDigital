@@ -12,9 +12,13 @@ import {
   formatNumber,
 } from "@/lib/mock/dashboard";
 
+import { useDemo } from "@/components/demo/DemoProvider";
+import { legacyDashboard } from "@/lib/demo/legacy.mjs";
+import { getDriLevel } from "@/lib/mock/dri";
 /* ---------- Kichik yordamchilar ---------- */
 
 const niceMax = (value) => {
+  if (!Number.isFinite(value) || value <= 0) return 1;
   const pow = 10 ** Math.floor(Math.log10(value));
   const candidates = [1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10];
   for (const c of candidates) {
@@ -161,7 +165,7 @@ function RevenueChart({ data }) {
 
         {Array.from({ length: gridCount + 1 }, (_, i) => {
           const gy = padT + (innerH / gridCount) * i;
-          const value = Math.round(max - (max / gridCount) * i);
+          const value = Math.round((max - (max / gridCount) * i) * (max < 10 ? 10 : 1)) / (max < 10 ? 10 : 1);
           return (
             <g key={i}>
               <line x1={padL} x2={W - CHART.padR} y1={gy} y2={gy} className="chart-grid" />
@@ -256,12 +260,10 @@ const STAT_DEFS = [
 ];
 
 export default function DashboardPage() {
-  const [period, setPeriod] = useState("month");
-  const data = DASHBOARD[period];
-
-  const digitalShare = Math.round(
-    (data.chart.digital.reduce((a, b) => a + b, 0) / data.chart.total.reduce((a, b) => a + b, 0)) * 100,
-  );
+  const { state, dispatch, organization } = useDemo();
+  const period=state.period;
+  const setPeriod=value=>dispatch({type:'period',value});
+  const { data, digitalShare, DIGITAL_SOURCES, KPI_ROWS, RECOMMENDATIONS, SEGMENTS } = useMemo(()=>legacyDashboard(state),[state]);
 
   return (
     <div className="dash">
@@ -271,7 +273,7 @@ export default function DashboardPage() {
           <h1>Boshqaruv paneli</h1>
           <p>
             <span className="live-dot" aria-hidden="true"></span>
-            Olimp sport klubi · so'nggi yangilanish: bugun, 14:32
+            {organization.name} · joriy demo ma’lumotlari
           </p>
         </div>
 
@@ -360,7 +362,7 @@ export default function DashboardPage() {
               <DriGauge value={data.stats.dri.value} />
               <div className="dri-card-value">
                 <span className="mono">{data.stats.dri.value}</span>
-                <em>Yuqori daraja</em>
+                <em>{getDriLevel(data.stats.dri.value).label}</em>
               </div>
             </div>
             <p className="dri-card-note">12 indikator bo'yicha vaznli baholash asosida</p>
@@ -381,7 +383,7 @@ export default function DashboardPage() {
                     <span style={{ width: `${source.share * 100}%` }}></span>
                   </span>
                   <span className="source-value mono">
-                    {formatMln(Math.round(data.digitalTotal * source.share))}
+                    {formatMln(data.digitalTotal * source.share)}
                   </span>
                 </li>
               ))}

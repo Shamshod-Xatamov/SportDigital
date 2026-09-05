@@ -1,10 +1,13 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
+import {useDemo} from "@/components/demo/DemoProvider";
+import {metrics,canAssess,customerActivity} from "@/lib/demo/model.mjs";
+import {FormDrawer} from "@/components/demo/Common";
 
 import Drawer from "@/components/ui/Drawer";
 import {
-  KPIS,
+  KPIS as BASE_KPIS,
   KPI_CATEGORIES,
   KPI_PERIODS,
   MONTH_LABELS,
@@ -224,7 +227,16 @@ function TrendChart({ kpi, target }) {
 /* ---------- Sahifa ---------- */
 
 export default function KpiPage() {
-  const [period, setPeriod] = useState("month");
+  const {state,profile,organizationId,dispatch}=useDemo();
+  const period=['month','quarter','year'].includes(state.period)?state.period:'month';
+  const setPeriod=value=>dispatch({type:'period',value});
+  const [goalsOpen,setGoalsOpen]=useState(false);
+  const closeGoals=useCallback(()=>setGoalsOpen(false),[]);
+  const goals=state.settings[`kpi:${organizationId}:${period}`]??{};
+  const m=metrics({...state,period});
+  const customers=state.customers.filter(c=>c.organizationId===organizationId);
+  const dynamic={ MF:customers.length?customers.filter(c=>!customerActivity(state,c.id).inactive&&customerActivity(state,c.id).lastDate).length/customers.length*100:0, SD:m.expense?m.revenue/m.expense*100:0, ARPU:m.customers?m.revenue/m.customers/1000:0, DRI:m.dri };
+  const KPIS=BASE_KPIS.map(k=>({...k,values:{...k.values,[period]:{...k.values[period],current:dynamic[k.code]??k.values[period].current,target:goals[k.code]??k.values[period].target}},source:dynamic[k.code]!==undefined?k.source:`Namuna: ${k.source}`}));
   const [category, setCategory] = useState("all");
   const [selected, setSelected] = useState(null);
 
@@ -238,7 +250,7 @@ export default function KpiPage() {
         const progress = calcProgress(values.current, values.target);
         return { kpi, ...values, change, progress, status: getStatus(progress) };
       }),
-    [period],
+    [state, period],
   );
 
   const visible = useMemo(
@@ -261,13 +273,14 @@ export default function KpiPage() {
 
   return (
     <div className="kpi-page">
+      {goalsOpen&&<FormDrawer title="KPI maqsadlari" initial={Object.fromEntries(KPIS.map(k=>[k.code,k.values[period].target]))} fields={KPIS.map(k=>({key:k.code,label:k.name,type:'number',min:0.01,step:'any'}))} onClose={closeGoals} onSave={values=>dispatch({type:'kpi-goals',values},'KPI maqsadlari saqlandi.')} />}
       <header className="org-page-head">
         <div>
           <span className="org-eyebrow">Samaradorlik monitoringi</span>
           <h1>KPI monitoring</h1>
           <p>8 ta asosiy ko'rsatkich — joriy qiymat, o'zgarish va maqsadga erishish darajasi.</p>
         </div>
-        <div className="period-switch" role="tablist" aria-label="Davr bo'yicha filtr">
+        <div className="legacy-inline-actions">{canAssess(profile.role) && <button className="org-secondary-button" onClick={()=>setGoalsOpen(true)}>Maqsadlarni o‘zgartirish</button>}<div className="period-switch" role="tablist" aria-label="Davr bo'yicha filtr">
           {KPI_PERIODS.map((item) => (
             <button
               key={item.id}
@@ -280,7 +293,7 @@ export default function KpiPage() {
               {item.label}
             </button>
           ))}
-        </div>
+        </div></div>
       </header>
 
       <section className="org-summary-grid" aria-label="KPI umumiy holati">

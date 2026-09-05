@@ -1,13 +1,15 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
+import { useDemo } from "@/components/demo/DemoProvider";
+import { driScores, canAssess, today } from "@/lib/demo/model.mjs";
 
 import Drawer from "@/components/ui/Drawer";
 import {
   DRI_GROUPS,
   DRI_INDICATORS,
   DRI_LEVELS,
-  DRI_PERIOD,
+  DRI_PERIOD as BASE_DRI_PERIOD,
   DRI_RECOMMENDATIONS,
   DRI_TREND,
   calculateDri,
@@ -277,8 +279,10 @@ function MethodologyDrawer({ open, onClose }) {
 }
 
 export default function DriPage() {
-  const [savedScores, setSavedScores] = useState(INITIAL_SCORES);
-  const [draftScores, setDraftScores] = useState(INITIAL_SCORES);
+  const {state,profile,organization,dispatch,setNotice}=useDemo();
+  const DRI_PERIOD={...BASE_DRI_PERIOD,organization:organization.name,label:today().slice(0,7),updatedAt:'Joriy demo bahosi'};
+  const savedScores = driScores(state);
+  const [draftScores, setDraftScores] = useState(() => driScores(state));
   const [editing, setEditing] = useState(false);
   const [methodOpen, setMethodOpen] = useState(false);
   const [savedNotice, setSavedNotice] = useState(false);
@@ -315,7 +319,7 @@ export default function DriPage() {
   };
 
   const saveAssessment = () => {
-    setSavedScores({ ...draftScores });
+    try { dispatch({type:"assessment",scores:draftScores},"DRI baholari saqlandi."); } catch(e) { setNotice(e.message); return; }
     setEditing(false);
     setSavedNotice(true);
   };
@@ -356,7 +360,7 @@ export default function DriPage() {
               </button>
             </>
           ) : (
-            <button type="button" className="org-primary-button" onClick={startEditing}>
+            <button type="button" className="org-primary-button" onClick={startEditing} disabled={!canAssess(profile.role)}>
               <Icon name="edit" />
               Baholashni tahrirlash
             </button>

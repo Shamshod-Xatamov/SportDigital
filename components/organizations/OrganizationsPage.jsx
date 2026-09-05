@@ -2,6 +2,8 @@
 
 import { useCallback, useMemo, useState } from "react";
 
+import { useLegacyRecords } from "@/components/demo/useLegacy";
+import LegacyRowActions from "@/components/demo/LegacyRowActions";
 import Drawer from "@/components/ui/Drawer";
 import {
   ORGANIZATIONS,
@@ -174,7 +176,8 @@ function ScoreMeter({ value, suffix = "", label }) {
 }
 
 export default function OrganizationsPage() {
-  const [organizations, setOrganizations] = useState(ORGANIZATIONS);
+  const { rows: organizations, save: saveRecord, canEdit, organization: currentOrganization } = useLegacyRecords("organizations");
+  const [formError, setFormError] = useState("");
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
   const [status, setStatus] = useState("all");
@@ -192,7 +195,7 @@ export default function OrganizationsPage() {
     const active = organizations.filter((organization) => organization.status === "active").length;
     const averageDri = Math.round(
       organizations.reduce((total, organization) => total + organization.dri, 0) /
-        organizations.length,
+        (organizations.length || 1),
     );
     const regions = new Set(organizations.map((organization) => organization.region)).size;
     return { active, averageDri, regions };
@@ -239,7 +242,8 @@ export default function OrganizationsPage() {
   };
 
   const openCreate = () => {
-    setForm(EMPTY_FORM);
+    setForm({ ...EMPTY_FORM, organization: currentOrganization?.name });
+    setFormError("");
     setFormOpen(true);
   };
 
@@ -265,7 +269,8 @@ export default function OrganizationsPage() {
       status: "onboarding",
       updatedAt: "Hozirgina",
     };
-    setOrganizations((current) => [next, ...current]);
+    next.id = form.id || crypto.randomUUID();
+    try { saveRecord(next); } catch (error) { setFormError(error.message); return; }
     setFormOpen(false);
     setSelected(next);
   };
@@ -278,7 +283,7 @@ export default function OrganizationsPage() {
           <h1>Tashkilotlar</h1>
           <p>Sport tashkilotlari, ularning faoliyati va raqamli rivojlanish holati.</p>
         </div>
-        <button type="button" className="org-primary-button" onClick={openCreate}>
+        <button type="button" className="org-primary-button" onClick={openCreate} disabled={!canEdit} title={!canEdit ? "Bu amal uchun administrator huquqi kerak" : undefined}>
           <Icon name="plus" />
           Tashkilot qo'shish
         </button>
@@ -436,13 +441,14 @@ export default function OrganizationsPage() {
                       {organization.updatedAt}
                     </td>
                     <td className="org-cell-action">
-                      <button
+                      {!canEdit && <button
                         type="button"
                         aria-label={`${organization.name} ma'lumotlarini ko'rish`}
                         onClick={() => setSelected(organization)}
                       >
                         <Icon name="arrow" />
-                      </button>
+                      </button>}
+                      {canEdit && <LegacyRowActions onView={() => setSelected(organization)} collection="organizations" row={organization} onEdit={row => { setForm({ ...row }); setSelected(null); setFormError(''); setFormOpen(true); }} />}
                     </td>
                   </tr>
                 );
@@ -523,6 +529,7 @@ export default function OrganizationsPage() {
         }
       >
         <form id="organization-create-form" className="org-form" onSubmit={createOrganization}>
+          {formError && <p className="demo-warning" role="alert">{formError}</p>}
           <div className="org-form-section">
             <h3>Asosiy ma'lumotlar</h3>
             <p>Tashkilotning reyestrda ko'rinadigan nomi va toifasi.</p>

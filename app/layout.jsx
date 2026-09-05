@@ -1,5 +1,7 @@
 import { Barlow_Condensed, JetBrains_Mono, Manrope } from "next/font/google";
 import "./globals.css";
+import "./demo.css";
+import DemoProvider from "@/components/demo/DemoProvider";
 
 const barlow = Barlow_Condensed({
   subsets: ["latin", "latin-ext"],
@@ -22,7 +24,8 @@ const chivoMono = JetBrains_Mono({
 });
 
 export const metadata = {
-  title: "SportDigital — Sport tashkilotlari uchun raqamli boshqaruv platformasi",
+  title:
+    "SportDigital — Sport tashkilotlari uchun raqamli boshqaruv platformasi",
   description:
     "SportDigital sport tashkilotlarining xizmatlari, moliyasi, marketingi va muxlislar faolligini yagona tabloda monitoring qiladi, raqamli rivojlanish indeksini hisoblaydi va boshqaruv qarorlari uchun tavsiyalar beradi.",
 };
@@ -40,7 +43,9 @@ export default function RootLayout({ children }) {
       className={`${barlow.variable} ${instrument.variable} ${chivoMono.variable}`}
       data-scroll-behavior="smooth"
     >
-      <body>{children}</body>
+      <body>
+        <DemoProvider>{children}</DemoProvider>
+      </body>
     </html>
   );
 }

@@ -1,6 +1,10 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
+import {useDemo} from "@/components/demo/DemoProvider";
+import {periodRange,PERIODS} from "@/lib/demo/model.mjs";
+import {downloadReport as downloadCsv} from "@/components/demo/ReportsPage";
+import LegacyPrintPreview from "@/components/demo/LegacyPrintPreview";
 
 import Drawer from "@/components/ui/Drawer";
 import {
@@ -186,6 +190,10 @@ function SummaryCard({ icon, label, value, note }) {
 }
 
 function CreateReportDrawer({ initialType, initialScheduled, onClose, onCreate }) {
+  const {state,organization}=useDemo();
+  const REPORT_ORGANIZATIONS=[organization.name];
+  const range=periodRange(state.period);
+  const REPORT_PERIODS=[`${PERIODS[state.period]} · ${range.start} — ${range.end}`];
   const initialReportType = REPORT_TYPES.find((item) => item.id === initialType) ?? REPORT_TYPES[0];
   const [form, setForm] = useState({
     title: `${initialReportType.label} — yangi hisobot`,
@@ -266,7 +274,7 @@ function CreateReportDrawer({ initialType, initialScheduled, onClose, onCreate }
           <div className="report-format-options">
             {REPORT_FORMATS.map((item) => (
               <label key={item.id} className={form.format === item.id ? "is-selected" : ""}>
-                <input type="radio" name="report-format" value={item.id} checked={form.format === item.id} onChange={() => update("format", item.id)} />
+                <input type="radio" name="report-format" disabled={item.id === "XLSX"} value={item.id} checked={form.format === item.id} onChange={() => update("format", item.id)} />
                 <span><Icon name={item.icon} /></span>
                 <strong>{item.label}</strong>
                 <small>{item.description}</small>
@@ -378,8 +386,12 @@ function ReportDetailDrawer({ report, onClose, onDownload }) {
 }
 
 export default function ReportsPage() {
-  const [history, setHistory] = useState(REPORT_HISTORY);
-  const [schedules, setSchedules] = useState(SCHEDULED_REPORTS);
+  const {state,profile,organizationId,dispatch}=useDemo();
+  const history=useMemo(()=>[...state.reports.filter(r=>r.organizationId===organizationId).map(r=>({...r,snapshot:r,type:r.kind??'finance',period:`${r.range.start} — ${r.range.end}`,createdAt:new Date(r.createdAt).toLocaleString('uz-UZ'),format:r.format??'PDF',size:'Tayyor',status:'ready'})),...REPORT_HISTORY.filter(r=>r.organization===state.organizations.find(o=>o.id===organizationId)?.name)], [state,organizationId]);
+  const [printing,setPrinting]=useState(null);
+  const closePrint=useCallback(()=>setPrinting(null),[]);
+  const schedules=state.settings[profile.id]?.legacy?.reportSchedules??SCHEDULED_REPORTS;
+  const setSchedules=update=>dispatch({type:'preferences',value:{...state.settings[profile.id]?.legacy,reportSchedules:typeof update==='function'?update(schedules):update}});
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [formatFilter, setFormatFilter] = useState("all");
@@ -426,35 +438,24 @@ export default function ReportsPage() {
         ...current,
       ]);
       setCreateOpen(false);
-      setNotice(`${type.label} uchun avtomatik jo'natish rejasi yaratildi.`);
+      setNotice(`${type.label} uchun demo reja yaratildi. Haqiqiy jo‘natma yuborilmaydi.`);
       return;
     }
 
-    const id = `RPT-260905-${String(history.length + 25).padStart(3, "0")}`;
-    const report = {
-      id,
-      title: form.title,
-      type: form.type,
-      organization: form.organization,
-      period: form.period,
-      createdAt: "Hozir",
-      format: form.format,
-      size: "Tayyorlanmoqda",
-      status: "processing",
-      author: "Aziz Karimov",
-    };
-    setHistory((current) => [report, ...current]);
+    if (!['finance','executive'].includes(form.type)) {
+      setCreateOpen(false);setNotice('Bu shablon namuna. Fayl uchun moliyaviy yoki boshqaruv hisobotini tanlang.');return;
+    }
+    const id=crypto.randomUUID();
+    dispatch({type:'report',kind:form.type,id,title:form.title,format:form.format},'Hisobot yaratildi.');
     setCreateOpen(false);
-    setNotice("Hisobot navbatga qo'shildi. Tayyor bo'lishi bilan yuklab olish mumkin.");
-    window.setTimeout(() => {
-      setHistory((current) => current.map((item) => item.id === id ? { ...item, status: "ready", size: form.format === "CSV" ? "742 KB" : form.format === "XLSX" ? "1,6 MB" : "2,2 MB" } : item));
-      setNotice("Yangi hisobot tayyor. Uni tarix bo'limidan yuklab olishingiz mumkin.");
-    }, 700);
+    setNotice('Hisobot tayyor va tarixga saqlandi.');
   };
 
   const downloadReport = (report) => {
     setSelected(null);
-    setNotice(`${report.title} · ${report.format} yuklab olish uchun tayyorlandi.`);
+    if(!report.snapshot){setNotice('Bu tarixiy hisobot namuna. Yuklash uchun yangi moliyaviy yoki boshqaruv hisobotini yarating.');return;}
+    if(report.format==='CSV')downloadCsv(report.snapshot);
+    else setPrinting(report.snapshot);
   };
 
   const toggleSchedule = (id, active) => {
@@ -471,6 +472,7 @@ export default function ReportsPage() {
 
   return (
     <div className="reports-page">
+      {printing&&<LegacyPrintPreview report={printing} onClose={closePrint}/>}
       <header className="org-page-head reports-page-head">
         <div>
           <span className="org-eyebrow">Hisobot markazi</span>

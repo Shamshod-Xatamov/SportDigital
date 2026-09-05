@@ -426,9 +426,9 @@ export default function MarketingPage() {
           <h1>Marketing samaradorligi</h1>
           <p>Kanallar bo'yicha auditoriya, kampaniyalar natijasi va ROI ko'rsatkichlarini kuzating.</p>
         </div>
-        <button type="button" className="org-primary-button" onClick={openCreate}>
+        <button type="button" className="org-primary-button" disabled title="Bu sahifa namuna: kampaniya yaratish keyingi bosqichda ulanadi.">
           <Icon name="plus" />
-          Kampaniya qo'shish
+          Kampaniya yaratish · keyin
         </button>
       </header>
 

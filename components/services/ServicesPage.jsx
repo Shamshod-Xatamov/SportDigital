@@ -2,6 +2,8 @@
 
 import { useCallback, useMemo, useState } from "react";
 
+import { useLegacyRecords } from "@/components/demo/useLegacy";
+import LegacyRowActions from "@/components/demo/LegacyRowActions";
 import Drawer from "@/components/ui/Drawer";
 import {
   SERVICES,
@@ -274,7 +276,8 @@ function ServiceCard({ service, onOpen }) {
 }
 
 export default function ServicesPage() {
-  const [services, setServices] = useState(SERVICES);
+  const { rows: services, save: saveRecord, canEdit, organization: currentOrganization } = useLegacyRecords("services");
+  const [formError, setFormError] = useState("");
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
   const [status, setStatus] = useState("all");
@@ -293,7 +296,7 @@ export default function ServicesPage() {
     const monthlyUses = services.reduce((total, service) => total + service.monthlyUses, 0);
     const monthlyRevenue = services.reduce((total, service) => total + service.monthlyRevenue, 0);
     const rated = services.filter((service) => service.reviews > 0);
-    const averageRating = rated.reduce((total, service) => total + service.rating, 0) / rated.length;
+    const averageRating = rated.reduce((total, service) => total + service.rating, 0) / (rated.length || 1);
     return { available, monthlyUses, monthlyRevenue, averageRating };
   }, [services]);
 
@@ -355,7 +358,8 @@ export default function ServicesPage() {
   };
 
   const openCreate = () => {
-    setForm(EMPTY_FORM);
+    setForm({ ...EMPTY_FORM, organization: currentOrganization?.name });
+    setFormError("");
     setFormOpen(true);
   };
 
@@ -388,7 +392,8 @@ export default function ServicesPage() {
       description: form.description.trim() || "Xizmat tavsifi kiritilmagan.",
       updatedAt: "Hozirgina",
     };
-    setServices((current) => [next, ...current]);
+    next.id = form.id || crypto.randomUUID();
+    try { saveRecord(next); } catch (error) { setFormError(error.message); return; }
     setFormOpen(false);
     setSelected(next);
   };
@@ -401,7 +406,7 @@ export default function ServicesPage() {
           <h1>Sport xizmatlari</h1>
           <p>Narxlar, foydalanish, daromad va mijozlar bahosini yagona katalogda boshqaring.</p>
         </div>
-        <button type="button" className="org-primary-button" onClick={openCreate}>
+        <button type="button" className="org-primary-button" onClick={openCreate} disabled={!canEdit} title={!canEdit ? "Bu amal uchun administrator huquqi kerak" : undefined}>
           <Icon name="plus" />
           Xizmat qo'shish
         </button>
@@ -606,12 +611,12 @@ export default function ServicesPage() {
         ) : null}
       </section>
 
-      <ServiceDetail service={selected} onClose={closeDetail} />
+      <ServiceDetail service={selected} onClose={closeDetail} actions={canEdit && selected ? <LegacyRowActions collection="services" row={selected} onEdit={row => { setForm({ ...row }); setSelected(null); setFormError(''); setFormOpen(true); }} /> : null} />
 
       <Drawer
         open={formOpen}
         onClose={closeForm}
-        title="Yangi xizmat"
+        title={form.id ? "Xizmatni tahrirlash" : "Yangi xizmat"}
         subtitle="Katalog uchun asosiy ma'lumotlarni kiriting"
         size="wide"
         icon={<Icon name="layers" />}
@@ -627,6 +632,7 @@ export default function ServicesPage() {
         }
       >
         <form id="service-create-form" className="org-form" onSubmit={createService}>
+          {formError && <p className="demo-warning" role="alert">{formError}</p>}
           <div className="org-form-section">
             <h3>Asosiy ma'lumotlar</h3>
             <p>Xizmat nomi, guruhi va uni taqdim etuvchi tashkilot.</p>
@@ -656,7 +662,7 @@ export default function ServicesPage() {
             <label className="org-form-field">
               <span>Tashkilot</span>
               <select name="organization" value={form.organization} onChange={updateForm}>
-                {SERVICE_ORGANIZATIONS.map((item) => (
+                {[currentOrganization.name].map((item) => (
                   <option key={item}>{item}</option>
                 ))}
               </select>
@@ -746,7 +752,7 @@ export default function ServicesPage() {
   );
 }
 
-function ServiceDetail({ service, onClose }) {
+function ServiceDetail({ service, onClose, actions }) {
   if (!service) return null;
   const category = getServiceCategory(service.category);
 
@@ -758,10 +764,11 @@ function ServiceDetail({ service, onClose }) {
       subtitle={`${service.code} · ${category.label}`}
       size="medium"
       icon={<Icon name={CATEGORY_ICONS[service.category]} />}
-      footer={
+      footer={<>
+        {actions}
         <button type="button" className="org-secondary-button" onClick={onClose}>
           Yopish
-        </button>
+        </button></>
       }
     >
       <div className="service-detail">

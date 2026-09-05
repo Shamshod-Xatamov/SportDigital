@@ -1,6 +1,9 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import {useDemo} from "@/components/demo/DemoProvider";
+import {canManage} from "@/lib/demo/model.mjs";
+import LegacyProfileSettings from "@/components/demo/LegacyProfileSettings";
 
 import Drawer from "@/components/ui/Drawer";
 import {
@@ -605,9 +608,11 @@ function PasswordDrawer({ open, onClose, onSuccess }) {
 }
 
 export default function SettingsPage() {
+  const {state,profile,organization,dispatch}=useDemo();
+  const initial=()=>({...cloneSettings(DEFAULT_SETTINGS),...state.settings[profile.id]?.legacy,organization:{...DEFAULT_SETTINGS.organization,...state.settings[profile.id]?.legacy?.organization,name:organization.name,phone:organization.phone}});
   const [activeTab, setActiveTab] = useState("general");
-  const [values, setValues] = useState(() => cloneSettings(DEFAULT_SETTINGS));
-  const [savedValues, setSavedValues] = useState(() => cloneSettings(DEFAULT_SETTINGS));
+  const [values, setValues] = useState(initial);
+  const [savedValues, setSavedValues] = useState(initial);
   const [notice, setNotice] = useState("");
   const [passwordOpen, setPasswordOpen] = useState(false);
   const [sessions, setSessions] = useState(ACTIVE_SESSIONS);
@@ -624,6 +629,7 @@ export default function SettingsPage() {
   };
 
   const save = () => {
+    dispatch({type:"preferences",value:cloneSettings(values)});
     setSavedValues(cloneSettings(values));
     setNotice("Sozlamalar muvaffaqiyatli saqlandi.");
   };
@@ -636,12 +642,12 @@ export default function SettingsPage() {
   const closePassword = useCallback(() => setPasswordOpen(false), []);
   const passwordSuccess = useCallback(() => {
     setPasswordOpen(false);
-    setNotice("Parol muvaffaqiyatli yangilandi.");
+    setNotice("Demo: parol formasi tekshirildi. Haqiqiy akkaunt paroli o‘zgarmadi.");
   }, []);
 
   const revokeSession = (id) => {
     setSessions((current) => current.filter((session) => session.id !== id));
-    setNotice("Tanlangan sessiya xavfsiz tarzda tugatildi.");
+    setNotice("Demo sessiya ro‘yxatdan olib tashlandi.");
   };
 
   return (
@@ -676,7 +682,7 @@ export default function SettingsPage() {
         <aside className="settings-section-nav" aria-label="Sozlamalar bo'limlari">
           <div className="settings-nav-heading">
             <span>Sozlamalar paneli</span>
-            <small>Olimp sport klubi</small>
+            <small>{organization.name}</small>
           </div>
           <div role="tablist" aria-orientation="vertical">
             {SETTINGS_TABS.map((tab) => (
@@ -710,7 +716,7 @@ export default function SettingsPage() {
             <span><Icon name={active.icon} /></span>
             <div><h2>{active.label}</h2><p>{active.description}</p></div>
           </header>
-          {activeTab === "general" ? <GeneralSettings values={values} update={update} /> : null}
+          {activeTab === "general" ? <>{profile.role!=="fan"&&<fieldset className="legacy-settings-fieldset" disabled={!canManage(profile.role)}><GeneralSettings values={values} update={update} /></fieldset>}<LegacyProfileSettings /></> : null}
           {activeTab === "notifications" ? <NotificationSettings values={values} update={update} /> : null}
           {activeTab === "security" ? (
             <SecuritySettings
@@ -721,7 +727,7 @@ export default function SettingsPage() {
               onRevoke={revokeSession}
             />
           ) : null}
-          {activeTab === "integrations" ? <IntegrationSettings values={values} update={update} /> : null}
+          {activeTab === "integrations" ? <><p className="demo-warning">Ulanishlar demo holatida. Haqiqiy to‘lov, xabar yoki API so‘rovi yuborilmaydi.</p><IntegrationSettings values={values} update={update} /></> : null}
         </main>
       </div>
 
